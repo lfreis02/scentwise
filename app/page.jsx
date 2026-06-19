@@ -986,85 +986,7 @@ function LeLaboPage({ onBack }) {
   );
 }
 
-// ===== DEMO CONSULTANT =====
-const DEMO_CONVERSATIONS = [
-  {
-    id: "office",
-    title: "A fragrance for the office",
-    subtitle: "Elegant but not overwhelming",
-    icon: "Briefcase",
-    messages: [
-      { role: "user", text: "I need a fragrance for the office — something elegant but not overwhelming. I work in finance and want to feel polished without anyone noticing the scent specifically." },
-      { role: "bot", text: "That's exactly the right instinct. The best office fragrances live in what we call the 'skin scent' zone — they read as you, just refined. Before I narrow this down, two quick things: what's your budget range, and have you worn niche before, or would this be your introduction?" },
-      { role: "user", text: "Budget is up to around $300, and yes I've worn designer scents (Sauvage, Bleu de Chanel) but never tried niche." },
-      { role: "bot", text: "Perfect — you're in for a real upgrade. Coming from Bleu de Chanel, three directions worth considering, all in your range:\n\nFirst, Hermès Terre d'Hermès Eau Givrée ($165). The cleanest, most refined daytime composition out there. A crisp citrus opening over mineral vetiver and cedar — it whispers competence. If Bleu de Chanel said 'I'm trying,' Terre Givrée says 'I don't need to.'\n\nSecond, Maison Francis Kurkdjian Aqua Universalis ($245). This is the office signature for a reason. White flowers, lily of the valley, and clean musk — it's like wearing freshly pressed linen. People notice you smell good, but can't tell what you're wearing.\n\nThird, if you want a step toward the more sophisticated, Le Labo Bergamote 22 ($220). Calabrian bergamot anchored by vetiver and musk so it actually lasts the full day, unlike most citrus fragrances. Distinctive without being loud.\n\nAll three are available at Saks, Bloomingdale's, or directly from the brands. My pick for your situation: Aqua Universalis. It's the most versatile and has the broadest appeal in conservative environments. Want me to go deeper on any of these?" },
-      { role: "user", text: "Aqua Universalis sounds perfect. What's the actual scent journey like during the day?" },
-      { role: "bot", text: "Great question — this is where the niche difference shows. Aqua Universalis opens bright but not sharp: bergamot and lily of the valley with a very clean, slightly soapy quality. Think the smell of a luxury hotel lobby in the first hour.\n\nAround the 2-3 hour mark it settles into its heart, where white musk and a subtle floral warmth emerge. This is where it becomes 'you, but better' — it loses the cologne brightness and becomes intimate.\n\nBy late afternoon you'll have a soft skin-scent that close colleagues catch when leaning in, but doesn't carry across a conference room. Total wear is around 6-8 hours, which is appropriate for the genre.\n\nApplication tip: 2 sprays — one on each side of the neck, not on shirt collars. Skin amplifies it correctly." },
-    ],
-  },
-  {
-    id: "newcomer",
-    title: "First niche fragrance",
-    subtitle: "Where to begin",
-    icon: "Sparkles",
-    messages: [
-      { role: "user", text: "I'm completely new to niche fragrances. I've only worn things from Sephora before. Where should I even start?" },
-      { role: "bot", text: "Welcome — this is a fun journey to start. The first thing to know: 'niche' doesn't mean weird or extreme. It means smaller houses where the perfumer has full creative control, often using better raw materials with longer development time. Most niche fragrances are actually more wearable than designer ones, just more interesting.\n\nTo point you somewhere you'll genuinely love, tell me: what designer fragrances have you actually enjoyed wearing, and what did you like about them? Even one or two examples will tell me a lot." },
-      { role: "user", text: "I really love YSL Black Opium and Viktor & Rolf Flowerbomb. I like sweet, warm, slightly addictive scents that get compliments." },
-      { role: "bot", text: "That's a clear preference profile — gourmand-floral, warm, magnetic. You're going to love what's waiting for you in niche.\n\nThree directions to consider, in increasing intensity:\n\nKilian Love, Don't Be Shy ($295). Marshmallow, orange blossom, vanilla — this is what Black Opium is trying to be when it grows up. Sweeter, creamier, more luxurious. Rihanna famously wore this for years. Available at Bloomingdale's and Nordstrom.\n\nMaison Francis Kurkdjian Baccarat Rouge 540 ($300 for 70ml). The single most influential modern fragrance. Saffron, jasmine, ambergris, and cedar that creates this almost otherworldly amber-floral effect. People will literally stop you and ask what you're wearing. This is the cult classic.\n\nInitio Side Effect ($295). Tobacco, rum, vanilla, cinnamon — the most sensual of the three. Coming from Flowerbomb, this would be your evening signature.\n\nMy honest recommendation for your first niche: Baccarat Rouge 540. It's expensive but it's the right introduction — you'll immediately understand why niche exists. It's also genuinely versatile (day and night). Worth ordering a sample first from a site like Scent Decant or directly from MFK before committing to the full bottle." },
-      { role: "user", text: "I've actually heard of Baccarat Rouge 540 from TikTok. Is it overhyped at this point?" },
-      { role: "bot", text: "Honest answer: yes and no. The TikTok hype made it ubiquitous in certain circles, especially among younger users wearing the cheaper body mist version. The full extrait remains genuinely exceptional and has been cult-loved by perfume enthusiasts since 2015 — long before TikTok found it.\n\nIf the social media association bothers you, a less-trendy alternative with a similar effect is MFK Grand Soir ($245) — warmer, more amber-vanilla, equally beautiful, and far less common. It's the move for someone who wants the MFK quality and craft but a more personal-feeling scent.\n\nThat said: 'overhyped' doesn't mean 'not great.' Baccarat Rouge 540 became famous because it's actually that good. Don't let internet trends dictate your nose." },
-    ],
-  },
-  {
-    id: "switch",
-    title: "Switching signature scent",
-    subtitle: "After 10 years of the same",
-    icon: "FlaskConical",
-    messages: [
-      { role: "user", text: "I've worn Tom Ford Tobacco Vanille for almost 10 years. I love it but I'm getting bored. What's a logical next step that keeps me in the same world but feels new?" },
-      { role: "bot", text: "Tobacco Vanille is one of the great signatures — you've had excellent taste for a decade. The good news is the niche world has direct lineage to that DNA, and there are several beautiful evolutions that will feel familiar but distinctly fresh.\n\nThree paths to consider:\n\nIf you want the closest sibling: Mancera Red Tobacco ($165). Tobacco, cinnamon, vanilla — same family, different temperament. Slightly drier, more spice-forward. It's the everyday cousin of Tobacco Vanille at half the price.\n\nIf you want a worthy successor with elevation: Initio Side Effect ($295). Tobacco, rum, vanilla, lavender. This is what TV would smell like if it were composed in 2020 instead of 2007 — same warmth, more dimension, longer-lasting.\n\nIf you want to move forward, not sideways: Maison Francis Kurkdjian Grand Soir ($245). This abandons tobacco entirely but keeps the warm amber-vanilla soul of TV. Honey, benzoin, and amber — it's the same emotional register, the same 'cozy luxury' feeling, but with new architecture. This is the move if you want to feel different, not just iterated.\n\nMy recommendation given your tenure with TV: try Grand Soir first. After 10 years with one fragrance, the goal is renewal, not replication. Order a sample from MFK directly — they'll send you a 5ml of any fragrance for $40 that gets credited toward a full bottle purchase." },
-      { role: "user", text: "Grand Soir sounds interesting. How is it different from TV in actual wear?" },
-      { role: "bot", text: "The wear is meaningfully different. Tobacco Vanille opens with a thick, almost suffocating sweetness that takes 30-60 minutes to settle into its iconic smoky-vanilla heart. It's a winter fragrance through and through.\n\nGrand Soir opens softer — there's an immediate warmth, but it's never cloying. You smell honey and a hint of orange blossom first, then it deepens into amber and benzoin. The vanilla is present but never dominant. The big difference: Grand Soir is wearable in summer evenings, on dates, at dinners — places where Tobacco Vanille would feel too heavy.\n\nThink of TV as a velvet smoking jacket and Grand Soir as a cashmere sweater. Same warmth, very different occasions. After a decade of velvet, the cashmere will feel revolutionary." },
-    ],
-  },
-  {
-    id: "specific",
-    title: "Looking for something specific",
-    subtitle: "A fragrance that smells like rain",
-    icon: "Quote",
-    messages: [
-      { role: "user", text: "This is going to sound weird. I want a fragrance that smells like petrichor — that smell of rain hitting dry earth. Does that exist?" },
-      { role: "bot", text: "Not weird at all — this is one of the most beautiful niche briefs out there. Petrichor (the term was coined by Australian scientists in 1964) comes from a molecule called geosmin, produced by soil bacteria. And yes, perfumers have absolutely captured it. It's a small but treasured corner of niche.\n\nThree houses have made petrichor the heart of a fragrance:\n\nDemeter Dirt ($30). The most literal interpretation — pure damp earth, almost shockingly accurate. It's a single-note experiment more than a wearable signature, but it's a great way to understand the geosmin profile cheaply before investing. Available at Sephora.\n\nL'Artisan Parfumeur Dzongkha ($175). Built around the smell of a Bhutanese monastery after rain — wet stone, iris, cedar, incense. Meditative, contemplative. This is petrichor in a specific place.\n\nOjar Petrichor ($245). The most refined of the three. Geosmin, vetiver, oakmoss, woods — captures the exact moment of summer rain on a forest floor, but with the architecture of a real perfume. This is the one you wear, not just experiment with.\n\nHonorable mention: D.S. & Durga Debaser ($195) features fig leaf with a wet-earth quality, less literal petrichor but in the same emotional family.\n\nMy recommendation: Ojar Petrichor. It's the only one that delivers both the conceptual accuracy and the wearability of a real fragrance. Niche perfumery at its most poetic — you'll have something virtually no one else wears." },
-    ],
-  },
-];
-
-// System prompt for the live consultant (used when API is reachable)
-const CONSULTANT_SYSTEM_PROMPT = `You are the ScentWise Consultant, a sophisticated and passionate fragrance specialist focused on niche and luxury perfumery. Speak in warm, elegant, natural English — like a knowledgeable friend who happens to be a perfumery expert.
-
-Help the person find their ideal fragrance. When they describe an occasion, preference, or budget:
-1. If important info is missing (budget, gender preference, current signature scents, climate), ask ONE natural follow-up question
-2. When you have enough to recommend, give concrete picks with: name and house, olfactory family and key notes, why it fits, approximate USD price, and where to find it
-3. Favor niche houses (Le Labo, Maison Francis Kurkdjian, Byredo, Creed, Diptyque, Amouage, Parfums de Marly, Initio, Xerjoff, Frederic Malle) and prestige lines (Tom Ford Private Blend, Chanel Les Exclusifs)
-4. Be educational without being pedantic. Keep replies to 2-3 short paragraphs.
-
-Tone: sophisticated yet accessible, never judgmental. Every budget deserves a thoughtful recommendation.`;
-
-// Set to true automatically when running outside the artifact (e.g. on Vercel/Next.js with a working API route).
-// In the artifact, the fetch will fail and we fall back gracefully to the demo experience.
-const LIVE_API_ENABLED = true;
-
 function DemoConsultant() {
-  const [mode, setMode] = React.useState("examples"); // "examples" | "live"
-
-  // ===== Demo (examples) state =====
-  const [activeId, setActiveId] = React.useState("office");
-  const [visibleCount, setVisibleCount] = React.useState(0);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const endRef = React.useRef(null);
-
-  // ===== Live state =====
   const [liveMessages, setLiveMessages] = React.useState([
     { role: "bot", text: "Hello — I'm your ScentWise consultant. Tell me what you're looking for: an occasion, a scent you're chasing, a feeling you want to wear, or a budget in mind. Where shall we begin?" },
   ]);
@@ -1073,46 +995,10 @@ function DemoConsultant() {
   const [apiHistory, setApiHistory] = React.useState([]);
   const liveEndRef = React.useRef(null);
 
-  const active = DEMO_CONVERSATIONS.find(c => c.id === activeId);
-
   React.useEffect(() => {
-    if (mode !== "examples") return;
-    setVisibleCount(0);
-    setIsPlaying(true);
-  }, [activeId, mode]);
+    liveEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [liveMessages, liveLoading]);
 
-  React.useEffect(() => {
-    if (mode !== "examples" || !isPlaying || !active) return;
-    if (visibleCount >= active.messages.length) {
-      setIsPlaying(false);
-      return;
-    }
-    const isUser = active.messages[visibleCount].role === "user";
-    const delay = isUser ? 600 : 1400;
-    const timer = setTimeout(() => setVisibleCount(c => c + 1), delay);
-    return () => clearTimeout(timer);
-  }, [visibleCount, isPlaying, active, mode]);
-
-  React.useEffect(() => {
-    if (mode === "examples") endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [visibleCount, isPlaying, mode]);
-
-  React.useEffect(() => {
-    if (mode === "live") liveEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [liveMessages, liveLoading, mode]);
-
-  function showAllInstantly() {
-    setIsPlaying(false);
-    setVisibleCount(active.messages.length);
-  }
-  function replay() {
-    setVisibleCount(0);
-    setIsPlaying(true);
-  }
-
-  const showTyping = mode === "examples" && isPlaying && visibleCount < active.messages.length && active.messages[visibleCount].role === "bot";
-
-  // ===== Live send with graceful fallback =====
   async function sendLive(text) {
     if (!text.trim() || liveLoading) return;
     const userText = text.trim();
@@ -1121,12 +1007,6 @@ function DemoConsultant() {
     setLiveMessages(prev => [...prev, { role: "user", text: userText }]);
     setLiveInput("");
     setLiveLoading(true);
-
-    if (!LIVE_API_ENABLED) {
-      setLiveLoading(false);
-      setLiveMessages(prev => [...prev, { role: "bot", text: "The live consultant activates once ScentWise is on its own domain. For now, switch to 'Example consultations' to see exactly how it works." }]);
-      return;
-    }
 
     try {
       const res = await fetch("/api/consultant", {
@@ -1141,10 +1021,9 @@ function DemoConsultant() {
       setLiveMessages(prev => [...prev, { role: "bot", text: reply }]);
       setApiHistory(prev => [...prev, { role: "assistant", content: reply }]);
     } catch (err) {
-      // Graceful fallback — no scary error, just an honest redirect
       setLiveMessages(prev => [...prev, {
         role: "bot",
-        text: "The live consultant isn't reachable from this preview yet — it comes online when ScentWise launches on its own site. In the meantime, tap 'Example consultations' above to see full sample conversations, or explore the 77 houses below. I'd love to help you for real soon.",
+        text: "I'm having trouble connecting right now. Please try again in a moment, or explore the houses below in the meantime.",
       }]);
     }
     setLiveLoading(false);
@@ -1152,176 +1031,72 @@ function DemoConsultant() {
 
   return (
     <div>
-      {/* Mode toggle */}
-      <div className="flex justify-center mb-8">
-        <div className="inline-flex border" style={{ borderColor: "rgba(196,168,130,0.4)", borderRadius: "2px", overflow: "hidden" }}>
-          <button
-            onClick={() => setMode("examples")}
-            className="px-5 py-2.5 text-xs uppercase tracking-[0.2em] transition"
-            style={mode === "examples" ? { background: "#5C4A32", color: "#F5F0E8" } : { background: "white", color: "#7A6650" }}
-          >
-            Example consultations
-          </button>
-          <button
-            onClick={() => setMode("live")}
-            className="px-5 py-2.5 text-xs uppercase tracking-[0.2em] transition flex items-center gap-2"
-            style={mode === "live" ? { background: "#5C4A32", color: "#F5F0E8" } : { background: "white", color: "#7A6650" }}
-          >
-            Try it live
-          </button>
+      <div className="bg-white rounded-lg overflow-hidden" style={{ border: "1px solid rgba(196,168,130,0.3)", boxShadow: "0 20px 60px rgba(92,74,50,0.08)" }}>
+        <div className="flex items-center gap-4 px-7 py-5" style={{ background: "#5C4A32" }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center serif text-xl text-white" style={{ background: "#C4A882" }}>S</div>
+          <div className="flex-1">
+            <h4 className="serif text-lg" style={{ color: "#F5F0E8" }}>ScentWise Consultant</h4>
+            <p className="text-xs" style={{ color: "rgba(245,240,232,0.65)" }}>Live · Ask anything about fragrance</p>
+          </div>
+          <div className="w-2 h-2 rounded-full" style={{ background: "#7DBD8A", boxShadow: "0 0 0 4px rgba(125,189,138,0.3)" }}></div>
         </div>
-      </div>
 
-      {mode === "examples" ? (
-        <>
-          {/* Scenario picker */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-6">
-            {DEMO_CONVERSATIONS.map((conv) => (
-              <button
-                key={conv.id}
-                onClick={() => setActiveId(conv.id)}
-                className="text-left p-4 border group hover:-translate-y-0.5"
-                style={
-                  activeId === conv.id
-                    ? { background: "#5C4A32", color: "#F5F0E8", borderColor: "#5C4A32", transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }
-                    : { background: "white", color: "#2C1F0F", borderColor: "rgba(196,168,130,0.4)", transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)" }
-                }
-              >
-                <p className="text-[10px] uppercase tracking-[0.2em] font-medium mb-2" style={{ opacity: 0.6 }}>
-                  Scenario {DEMO_CONVERSATIONS.indexOf(conv) + 1}
-                </p>
-                <p className="serif text-base md:text-lg leading-tight mb-1">{conv.title}</p>
-                <p className="text-[11px] font-light" style={{ opacity: 0.7 }}>{conv.subtitle}</p>
+        <div className="chat-scroll overflow-y-auto px-5 md:px-7 py-7 flex flex-col gap-5" style={{ background: "#FDFAF7", height: "520px" }}>
+          {liveMessages.map((m, i) => (
+            <div key={i} className={`flex gap-3 max-w-[88%] fade-up ${m.role === "user" ? "self-end flex-row-reverse" : ""}`}>
+              <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm" style={m.role === "user" ? { background: "#E8DCC8", color: "#5C4A32" } : { background: "#5C4A32", color: "#F5F0E8", fontFamily: "'Cormorant Garamond', serif" }}>
+                {m.role === "user" ? "U" : "S"}
+              </div>
+              <div className="px-4 py-3 text-sm leading-relaxed font-light whitespace-pre-wrap" style={m.role === "user" ? { background: "#5C4A32", color: "#F5F0E8", borderRadius: "4px 4px 0 4px" } : { background: "white", color: "#2C1F0F", border: "1px solid rgba(196,168,130,0.25)", borderRadius: "4px 4px 4px 0" }}>
+                {m.text}
+              </div>
+            </div>
+          ))}
+          {liveLoading && (
+            <div className="flex gap-3 fade-up">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: "#5C4A32", color: "#F5F0E8", fontFamily: "'Cormorant Garamond', serif" }}>S</div>
+              <div className="px-4 py-3 bg-white border flex items-center gap-1.5" style={{ borderColor: "rgba(196,168,130,0.25)", borderRadius: "4px 4px 4px 0" }}>
+                <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
+                <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
+                <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
+              </div>
+            </div>
+          )}
+          <div ref={liveEndRef} />
+        </div>
+
+        {liveMessages.length <= 1 && (
+          <div className="px-5 md:px-7 py-4 flex flex-wrap gap-2 border-t" style={{ background: "#FDFAF7", borderColor: "rgba(196,168,130,0.15)" }}>
+            {[
+              "Something elegant for the office",
+              "My first niche fragrance",
+              "A fresh scent for summer",
+              "Something for a winter evening",
+            ].map((s, i) => (
+              <button key={i} onClick={() => sendLive(s)} disabled={liveLoading} className="px-4 py-2 border rounded-full text-xs transition disabled:opacity-50" style={{ borderColor: "#C4A882", color: "#8B6F47", background: "transparent" }} onMouseEnter={(e) => { e.currentTarget.style.background = "#8B6F47"; e.currentTarget.style.color = "white"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#8B6F47"; }}>
+                {s}
               </button>
             ))}
           </div>
+        )}
 
-          {/* Demo chat container */}
-          <div className="bg-white rounded-lg overflow-hidden" style={{ border: "1px solid rgba(196,168,130,0.3)", boxShadow: "0 20px 60px rgba(92,74,50,0.08)" }}>
-            <div className="flex items-center gap-4 px-7 py-5" style={{ background: "#5C4A32" }}>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center serif text-xl text-white" style={{ background: "#C4A882" }}>S</div>
-              <div className="flex-1">
-                <h4 className="serif text-lg" style={{ color: "#F5F0E8" }}>ScentWise Consultant</h4>
-                <p className="text-xs" style={{ color: "rgba(245,240,232,0.65)" }}>Demo conversation · {active.title}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                {!isPlaying && visibleCount === active.messages.length && (
-                  <button onClick={replay} className="text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 transition" style={{ color: "rgba(245,240,232,0.85)", border: "1px solid rgba(245,240,232,0.3)" }}>
-                    Replay
-                  </button>
-                )}
-                {isPlaying && visibleCount < active.messages.length && (
-                  <button onClick={showAllInstantly} className="text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 transition" style={{ color: "rgba(245,240,232,0.85)", border: "1px solid rgba(245,240,232,0.3)" }}>
-                    Show all
-                  </button>
-                )}
-                <div className="w-2 h-2 rounded-full" style={{ background: "#7DBD8A", boxShadow: "0 0 0 4px rgba(125,189,138,0.3)" }}></div>
-              </div>
-            </div>
-
-            <div className="chat-scroll overflow-y-auto px-5 md:px-7 py-7 flex flex-col gap-5" style={{ background: "#FDFAF7", height: "520px" }}>
-              {active.messages.slice(0, visibleCount).map((m, i) => (
-                <div key={i} className={`flex gap-3 max-w-[88%] fade-up ${m.role === "user" ? "self-end flex-row-reverse" : ""}`}>
-                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm" style={m.role === "user" ? { background: "#E8DCC8", color: "#5C4A32" } : { background: "#5C4A32", color: "#F5F0E8", fontFamily: "'Cormorant Garamond', serif" }}>
-                    {m.role === "user" ? "U" : "S"}
-                  </div>
-                  <div className="px-4 py-3 text-sm leading-relaxed font-light whitespace-pre-wrap" style={m.role === "user" ? { background: "#5C4A32", color: "#F5F0E8", borderRadius: "4px 4px 0 4px" } : { background: "white", color: "#2C1F0F", border: "1px solid rgba(196,168,130,0.25)", borderRadius: "4px 4px 4px 0" }}>
-                    {m.text}
-                  </div>
-                </div>
-              ))}
-              {showTyping && (
-                <div className="flex gap-3 fade-up">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: "#5C4A32", color: "#F5F0E8", fontFamily: "'Cormorant Garamond', serif" }}>S</div>
-                  <div className="px-4 py-3 bg-white border flex items-center gap-1.5" style={{ borderColor: "rgba(196,168,130,0.25)", borderRadius: "4px 4px 4px 0" }}>
-                    <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
-                    <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
-                    <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
-                  </div>
-                </div>
-              )}
-              <div ref={endRef} />
-            </div>
-
-            <div className="flex items-center justify-between px-7 py-4 border-t" style={{ background: "#FDFAF7", borderColor: "rgba(196,168,130,0.15)" }}>
-              <p className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: "#A89880" }}>
-                {visibleCount === 0 ? "Conversation starting..." : visibleCount === active.messages.length ? "Conversation complete" : `${visibleCount} of ${active.messages.length} messages`}
-              </p>
-              <p className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: "#A89880" }}>
-                Curated example
-              </p>
-            </div>
-          </div>
-        </>
-      ) : (
-        /* ===== LIVE MODE ===== */
-        <div className="bg-white rounded-lg overflow-hidden" style={{ border: "1px solid rgba(196,168,130,0.3)", boxShadow: "0 20px 60px rgba(92,74,50,0.08)" }}>
-          <div className="flex items-center gap-4 px-7 py-5" style={{ background: "#5C4A32" }}>
-            <div className="w-10 h-10 rounded-full flex items-center justify-center serif text-xl text-white" style={{ background: "#C4A882" }}>S</div>
-            <div className="flex-1">
-              <h4 className="serif text-lg" style={{ color: "#F5F0E8" }}>ScentWise Consultant</h4>
-              <p className="text-xs" style={{ color: "rgba(245,240,232,0.65)" }}>Live · Ask anything about fragrance</p>
-            </div>
-            <div className="w-2 h-2 rounded-full" style={{ background: "#7DBD8A", boxShadow: "0 0 0 4px rgba(125,189,138,0.3)" }}></div>
-          </div>
-
-          <div className="chat-scroll overflow-y-auto px-5 md:px-7 py-7 flex flex-col gap-5" style={{ background: "#FDFAF7", height: "520px" }}>
-            {liveMessages.map((m, i) => (
-              <div key={i} className={`flex gap-3 max-w-[88%] fade-up ${m.role === "user" ? "self-end flex-row-reverse" : ""}`}>
-                <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-sm" style={m.role === "user" ? { background: "#E8DCC8", color: "#5C4A32" } : { background: "#5C4A32", color: "#F5F0E8", fontFamily: "'Cormorant Garamond', serif" }}>
-                  {m.role === "user" ? "U" : "S"}
-                </div>
-                <div className="px-4 py-3 text-sm leading-relaxed font-light whitespace-pre-wrap" style={m.role === "user" ? { background: "#5C4A32", color: "#F5F0E8", borderRadius: "4px 4px 0 4px" } : { background: "white", color: "#2C1F0F", border: "1px solid rgba(196,168,130,0.25)", borderRadius: "4px 4px 4px 0" }}>
-                  {m.text}
-                </div>
-              </div>
-            ))}
-            {liveLoading && (
-              <div className="flex gap-3 fade-up">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: "#5C4A32", color: "#F5F0E8", fontFamily: "'Cormorant Garamond', serif" }}>S</div>
-                <div className="px-4 py-3 bg-white border flex items-center gap-1.5" style={{ borderColor: "rgba(196,168,130,0.25)", borderRadius: "4px 4px 4px 0" }}>
-                  <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
-                  <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
-                  <span className="dot w-1.5 h-1.5 rounded-full" style={{ background: "#C4A882" }}></span>
-                </div>
-              </div>
-            )}
-            <div ref={liveEndRef} />
-          </div>
-
-          {liveMessages.length <= 1 && (
-            <div className="px-5 md:px-7 py-4 flex flex-wrap gap-2 border-t" style={{ background: "#FDFAF7", borderColor: "rgba(196,168,130,0.15)" }}>
-              {[
-                "Something elegant for the office",
-                "My first niche fragrance",
-                "A fresh scent for summer",
-                "Something for a winter evening",
-              ].map((s, i) => (
-                <button key={i} onClick={() => sendLive(s)} disabled={liveLoading} className="px-4 py-2 border rounded-full text-xs transition disabled:opacity-50" style={{ borderColor: "#C4A882", color: "#8B6F47", background: "transparent" }} onMouseEnter={(e) => { e.currentTarget.style.background = "#8B6F47"; e.currentTarget.style.color = "white"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#8B6F47"; }}>
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="flex border-t bg-white" style={{ borderColor: "rgba(196,168,130,0.2)" }}>
-            <input
-              type="text"
-              value={liveInput}
-              onChange={(e) => setLiveInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") sendLive(liveInput); }}
-              placeholder="Describe what you're looking for..."
-              disabled={liveLoading}
-              maxLength={500}
-              className="flex-1 px-6 py-5 outline-none text-sm font-light bg-transparent disabled:opacity-50"
-              style={{ color: "#2C1F0F" }}
-            />
-            <button onClick={() => sendLive(liveInput)} disabled={liveLoading || !liveInput.trim()} className="px-6 py-5 text-white flex items-center gap-2 text-xs uppercase tracking-widest transition disabled:opacity-50" style={{ background: "#5C4A32" }}>
-              Send
-            </button>
-          </div>
+        <div className="flex border-t bg-white" style={{ borderColor: "rgba(196,168,130,0.2)" }}>
+          <input
+            type="text"
+            value={liveInput}
+            onChange={(e) => setLiveInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") sendLive(liveInput); }}
+            placeholder="Describe what you're looking for..."
+            disabled={liveLoading}
+            maxLength={500}
+            className="flex-1 px-6 py-5 outline-none text-sm font-light bg-transparent disabled:opacity-50"
+            style={{ color: "#2C1F0F" }}
+          />
+          <button onClick={() => sendLive(liveInput)} disabled={liveLoading || !liveInput.trim()} className="px-6 py-5 text-white flex items-center gap-2 text-xs uppercase tracking-widest transition disabled:opacity-50" style={{ background: "#5C4A32" }}>
+            Send
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -2210,6 +1985,15 @@ export default function ScentWise() {
 
   useScrollReveal();
 
+  // Always open the page at the top (hero section) on load,
+  // overriding the browser's scroll-restoration behavior.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   const filteredBrands = BRANDS.filter((b) => {
     const q = brandSearch.toLowerCase();
     const matchesSearch = !q || b.name.toLowerCase().includes(q) || b.perfumes.some((p) => p.name.toLowerCase().includes(q));
@@ -2410,18 +2194,14 @@ export default function ScentWise() {
       <section id="consultor" className="px-6 md:px-12 py-24" style={{ background: "#F9F6F1" }}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12" data-reveal>
-            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#A67C52" }}>Olfactory intelligence · Live preview</p>
-            <h2 className="serif font-light mb-5" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "#2C1F0F" }}>How the consultant works</h2>
+            <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#A67C52" }}>Olfactory intelligence</p>
+            <h2 className="serif font-light mb-5" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "#2C1F0F" }}>Your personal fragrance consultant</h2>
             <p className="text-base font-light max-w-xl mx-auto" style={{ color: "#7A6650" }}>
-              Try the consultant live, or browse curated example consultations to see how it guides you from a first message to the perfect recommendation.
+              Tell the consultant what you're looking for — an occasion, a scent you love, a feeling, or a budget — and get personalized recommendations from the world's finest houses.
             </p>
           </div>
 
           <DemoConsultant />
-
-          <p className="text-xs text-center mt-8 font-light max-w-md mx-auto" style={{ color: "#A89880" }}>
-            The live consultant comes fully online when ScentWise launches on its own site. Example consultations show exactly how it works.
-          </p>
         </div>
       </section>
 
