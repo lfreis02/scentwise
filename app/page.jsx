@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { MessageCircle, Sparkles, Building2, FlaskConical, Briefcase, BookMarked, Wallet, Users, ArrowRight, ExternalLink, Search, ArrowLeft, Quote } from "lucide-react";
 
 // Scroll-reveal hook: fades + lifts elements into view as the user scrolls
@@ -1958,6 +1959,7 @@ export default function ScentWise() {
   const [nameInput, setNameInput] = useState("");
 
   const [activeBrand, setActiveBrand] = useState(null);
+  const router = useRouter();
   const [brandSearch, setBrandSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
@@ -2236,7 +2238,14 @@ export default function ScentWise() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredBrands.map((b) => (
-              <button key={b.id} onClick={() => { setActiveBrand(b.id); window.scrollTo(0, 0); }} className="text-left p-7 border bg-white hover:-translate-y-1.5 hover:shadow-2xl group" style={{ borderColor: "rgba(196,168,130,0.3)", transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease" }} onMouseEnter={(e) => e.currentTarget.style.borderColor = "#C4A882"} onMouseLeave={(e) => e.currentTarget.style.borderColor = "rgba(196,168,130,0.3)"}>
+              <button key={b.id} onClick={() => {
+  if (b.id === "lelabo" || b.id === "mfk" || b.id === "creed") {
+    router.push(`/brands/${b.id}`);
+  } else {
+    setActiveBrand(b.id);
+    window.scrollTo(0, 0);
+  }
+}} className="text-left p-7 border bg-white hover:-translate-y-1.5 hover:shadow-2xl group" style={{ borderColor: "rgba(196,168,130,0.3)", transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease" }} onMouseEnter={(e) => e.currentTarget.style.borderColor = "#C4A882"} onMouseLeave={(e) => e.currentTarget.style.borderColor = "rgba(196,168,130,0.3)"}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <p className="text-[10px] uppercase tracking-[0.3em] font-medium px-2 py-1 rounded" style={{ color: "#A67C52", background: "#F5F0E8" }}>{CATEGORY_LABELS[b.category]}</p>
