@@ -117,6 +117,15 @@ export default async function BrandPage({ params }) {
         </div>
       </section>
 
+       {!philosophy.headline && !philosophy.body && brand.description && (
+       <section className="px-6 md:px-10 pb-16 md:pb-24" style={{ background: t.bg }}>
+           <div className="max-w-3xl mx-auto">
+            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— about the house</p>
+            <p className="text-base md:text-lg font-light leading-relaxed" style={{ color: t.body }}>{brand.description}</p>
+           </div>
+       </section>
+      )}
+
       {(philosophy.headline || philosophy.body) && (
         <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.dark, color: t.onDark }}>
           <div className="max-w-4xl mx-auto">
