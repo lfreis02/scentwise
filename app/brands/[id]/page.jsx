@@ -101,10 +101,12 @@ export default async function BrandPage({ params }) {
                 <p className="text-base">{brand.birthplace}</p>
               </div>
             )}
-            <div className="border-l-2 pl-4" style={{ borderColor: t.ink }}>
-              <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-2`}>collection</p>
-              <p className="text-base">{perfumes.length} signature scents</p>
-            </div>
+            {perfumes.length > 0 && (
+              <div className="border-l-2 pl-4" style={{ borderColor: t.ink }}>
+                <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-2`}>collection</p>
+                <p className="text-base">{perfumes.length} signature scents</p>
+              </div>
+            )}
           </div>
 
           {brand.official_url && (
@@ -265,10 +267,10 @@ export default async function BrandPage({ params }) {
 
                     <div className="p-6 md:p-10 border-t-2" style={{ borderColor: t.ink, background: "#ffffff", color: "#1A1A1A" }}>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10 pb-8 border-b" style={{ borderColor: "rgba(0,0,0,0.15)" }}>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>perfumer</p><p className="text-sm font-medium">{p.perfumer}</p></div>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>launched</p><p className="text-sm font-medium">{p.year}</p></div>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>sillage</p><p className="text-sm font-medium">{p.sillage}</p></div>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>longevity</p><p className="text-sm font-medium">{p.longevity}</p></div>
+                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>perfumer</p><p className="text-sm font-medium">{p.perfumer || "Undisclosed"}</p></div>
+                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>launched</p><p className="text-sm font-medium">{p.year || "—"}</p></div>
+                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>sillage</p><p className="text-sm font-medium">{p.sillage || "—"}</p></div>
+                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>longevity</p><p className="text-sm font-medium">{p.longevity || "—"}</p></div>
                       </div>
 
                       {p.inspiration && (
@@ -301,7 +303,7 @@ export default async function BrandPage({ params }) {
                         </div>
                         <div>
                           <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-3`}>— price</p>
-                          <p className="serif text-2xl font-light">{p.price}</p>
+                          <p className="serif text-2xl font-light">{p.price || "See retailer"}</p>
                           <p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mt-2`}>eau de parfum</p>
                         </div>
                       </div>

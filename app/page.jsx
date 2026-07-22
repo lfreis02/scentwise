@@ -1,7 +1,34 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { MessageCircle, Sparkles, Building2, FlaskConical, Briefcase, BookMarked, Wallet, Users, ArrowRight, ExternalLink, Search, ArrowLeft, Quote } from "lucide-react";
+import { MessageCircle, Sparkles, Building2, FlaskConical, Briefcase, BookMarked, Wallet, Users, ArrowRight, Search } from "lucide-react";
+
+// Brands with a full, verified deep-dive page (founders, timeline, perfumers,
+// ingredients, 5 compositions). Keep in sync as enrichment progresses — or later
+// replace with an is_featured flag fetched from Supabase.
+const DEEP_DIVE_IDS = new Set([
+  "lelabo", "mfk", "creed", "byredo", "amouage",
+  "diptyque", "fredericmalle", "sergelutens", "parfumsdemarly", "xerjoff",
+]);
+
+// Brands with a solid Tier 2 profile page (philosophy, founders, ingredients,
+// 3 compositions) — real content, lighter than a full deep-dive.
+const TIER2_IDS = new Set([
+  "hermessence", "diorprive", "chanellesexclusifs",
+  "guerlainexclusifs", "armaniprive", "tomfordprivate",
+  "guerlain", "penhaligons", "santamariaNovella", "acquadiparma", "floris",
+  "caron", "houbigant", "lubin", "molinard", "fragonard", "annicksgoutal",
+  "carthusia", "lartisan", "maisonviolet", "krigler",
+  "kilian", "roja", "nishane", "initio", "mancera",
+  "montale", "margiela", "nasomatto", "tiziana", "clive",
+  "bdk", "matiere", "barrois", "memo", "atelier",
+  "dsdurga", "zoologist", "imaginary", "etat", "histoires",
+  "ormonde", "papillon", "puredistance", "widian", "thameen",
+  "stephane", "fueguia", "vilhelm", "gallivant", "miller",
+  "crivelli", "phlur", "aesop", "floraiku", "ffern",
+  "bogue", "bortnikoff", "stora", "fzotic", "lorenzovilloresi",
+  "argos", "atelierdessens", "maha", "nez", "ojar",
+]);
 
 // Scroll-reveal hook: fades + lifts elements into view as the user scrolls
 function useScrollReveal() {
@@ -90,7 +117,7 @@ const BRANDS = [
   {
     id: "roja", name: "Roja Parfums", category: "niche", origin: "UK · 2011",
     desc: "Founded by master perfumer Roja Dove, often called the 'Professeur de Parfums.' Ultra-luxury British house known for opulent classical compositions with extraordinary longevity. Royal heritage aesthetic with crystal flacons.",
-    url: "https://www.rojaparfums.com/",
+    url: "https://rojalondon.com/",
     perfumes: [],
   },
   {
@@ -114,7 +141,7 @@ const BRANDS = [
   {
     id: "mancera", name: "Mancera", category: "niche", origin: "France · 2008",
     desc: "Founded by Pierre Montale's nephew. Carries the Montale DNA of oud-rich, sillage-monster compositions at slightly more accessible niche prices. Sister brand to Montale, sharing some perfumer talent.",
-    url: "https://mancera.com/",
+    url: "https://manceraparfums.com/",
     perfumes: [],
   },
   {
@@ -180,7 +207,7 @@ const BRANDS = [
   {
     id: "matiere", name: "Matière Première", category: "niche", origin: "France · 2019",
     desc: "Founded by perfumer Aurélien Guichard, son of legendary perfumer Jean Guichard. Built around showcasing single raw materials at extraordinary quality — minimalist concept, maximalist craft.",
-    url: "https://matierepremiere.com/",
+    url: "https://matiere-premiere.com/",
     perfumes: [],
   },
   // ============ HERITAGE HOUSES ============
@@ -199,7 +226,7 @@ const BRANDS = [
   {
     id: "lubin", name: "Lubin", category: "heritage", origin: "France · 1798",
     desc: "Founded by Pierre-François Lubin, apprentice to Marie-Antoinette's perfumer Fargeon. Became the favored perfumer of Empress Josephine, Napoleon's circle, and 19th-century European royal courts. Black Jade revives a scent created for Marie Antoinette herself.",
-    url: "https://www.lubin-parfums.fr/",
+    url: "https://www.lubin.eu/",
     perfumes: [],
   },
   {
@@ -217,7 +244,7 @@ const BRANDS = [
   {
     id: "annicksgoutal", name: "Goutal Paris", category: "heritage", origin: "France · 1981",
     desc: "Founded by Annick Goutal, former pianist and model turned perfumer. Romantic, deeply French compositions inspired by Parisian gardens and travel memories. Eau d'Hadrien and Petite Chérie remain icons.",
-    url: "https://www.goutalparis.com/",
+    url: "https://www.annickgoutal.com/",
     perfumes: [],
   },
   {
@@ -254,11 +281,11 @@ const BRANDS = [
   {
     id: "thameen", name: "Thameen London", category: "niche", origin: "UK · 2013",
     desc: "Luxury British house drawing inspiration from British royal heritage and Middle Eastern grandeur. Each fragrance themed around historic royal artifacts. High-performance compositions with crown-detailed bottles.",
-    url: "https://www.thameenlondon.com/",
+    url: "https://thameenfragrance.com/",
     perfumes: [],
   },
   {
-    id: "vilhelm", name: "Vilhelm Parfumerie", category: "niche", origin: "USA / Sweden · 2014",
+    id: "vilhelm", name: "Vilhelm Parfumerie", category: "niche", origin: "USA / Sweden · 2015",
     desc: "Founded by Jan Ahlgren. Inspired by his grandfather Vilhelm. Contemporary minimalist Scandinavian aesthetic. Mango Skin became viral on TikTok. Now distributed by Inter Parfums.",
     url: "https://www.vilhelmparfumerie.com/",
     perfumes: [],
@@ -273,7 +300,7 @@ const BRANDS = [
   {
     id: "stephane", name: "Stéphane Humbert Lucas 777", category: "niche", origin: "France · 2013",
     desc: "Founded by perfumer Stéphane Humbert Lucas, formerly of SoOud and Nez à Nez. Opulent compositions with Middle Eastern soul. Khôl de Bahreïn and Black Gemstone are contemporary classics.",
-    url: "https://www.stephanehumbertlucas777.com/",
+    url: "https://stephanehumbertlucas.com/",
     perfumes: [],
   },
   {
@@ -283,15 +310,15 @@ const BRANDS = [
     perfumes: [],
   },
   {
-    id: "bortnikoff", name: "Bortnikoff", category: "niche", origin: "Russia / Israel · 2014",
+    id: "bortnikoff", name: "Bortnikoff", category: "niche", origin: "Thailand · 2018",
     desc: "Founded by Dmitry Bortnikoff. Independent, ultra-niche house specializing in extreme oud and amber compositions. Cult following among hardcore fragrance enthusiasts seeking the most intense compositions available.",
     url: "https://bortnikoff.com/",
     perfumes: [],
   },
   {
-    id: "maha", name: "Maison Sybarite", category: "niche", origin: "Lebanon / UK · 2018",
-    desc: "Founded by Lebanese fragrance entrepreneur. Refined Middle Eastern luxury house with minimalist bottle design and sophisticated oud and rose compositions. Underrated gem of contemporary niche.",
-    url: "https://maisonsybarite.com/",
+    id: "maha", name: "Maison Sybarite", category: "niche", origin: "France · 2019",
+    desc: "Founded in Paris by Annabel Dragan and Katia Milo. Creator of the first water-based fine fragrances, built on a patented oil-in-water emulsion instead of alcohol. Rich, spice- and wood-forward compositions by master perfumer Antoine Lie.",
+    url: "https://sybarite-wellness.com/",
     perfumes: [],
   },
   // ============ ITALIAN ARTISANS ============
@@ -304,12 +331,6 @@ const BRANDS = [
   {
     id: "santamariaNovella", name: "Santa Maria Novella", category: "heritage", origin: "Italy · 1612",
     desc: "Founded by Dominican friars in Florence — possibly the oldest still-operating pharmacy and perfumery in the world. Acqua della Regina was created for Catherine de' Medici when she became Queen of France. Living history.",
-    url: "https://www.smnovella.com/",
-    perfumes: [],
-  },
-  {
-    id: "officinaprofumo", name: "Officina Profumo-Farmaceutica", category: "heritage", origin: "Italy · 1612",
-    desc: "Florentine perfumery from the Santa Maria Novella tradition. Centuries of monastic formulas combined with modern sophistication. Often considered alongside SMN as living perfumery archaeology.",
     url: "https://www.smnovella.com/",
     perfumes: [],
   },
@@ -363,9 +384,9 @@ const BRANDS = [
     perfumes: [],
   },
   {
-    id: "bogue", name: "Bogue Profumo", category: "niche", origin: "Italy · 2013",
+    id: "bogue", name: "Bogue Profumo", category: "niche", origin: "Italy · 2012",
     desc: "Founded by Antonio Gardoni in Brescia. Architectural training translated into structured, often dark and animalic compositions. MEM and Maai are legendary in connoisseur circles. Perfume as architectural object.",
-    url: "https://www.bogueprofumo.com/",
+    url: "https://bogue-profumo.com/",
     perfumes: [],
   },
   {
@@ -414,7 +435,7 @@ const BRANDS = [
   {
     id: "fzotic", name: "Fzotic (Bruno Fazzolari)", category: "niche", origin: "USA · 2013",
     desc: "Founded by painter and perfumer Bruno Fazzolari in San Francisco. Synesthesia-driven approach — scents tied to colors and visual art. Lampblack, Cadenet, and Au Delà Narcisse for the connoisseur seeking the avant-garde.",
-    url: "https://www.brunofazzolari.com/",
+    url: "https://fzotic.com/",
     perfumes: [],
   },
   {
@@ -426,7 +447,7 @@ const BRANDS = [
   {
     id: "atelierdessens", name: "Atelier des Sens", category: "niche", origin: "France · 2024",
     desc: "Founded by Andrei Vlad in Grasse. Newcomer with serious credentials — 'a sanctuary where immortal emotions come to life.' Three opening extraits (Zino, Rozzo, Spiros) demonstrate haute parfumerie ambitions.",
-    url: "https://atelierdessens.com/",
+    url: "https://ads-perfumes.com/",
     perfumes: [],
   },
   {
@@ -636,7 +657,6 @@ export default function ScentWise() {
   const [showNamePrompt, setShowNamePrompt] = useState(false);
   const [nameInput, setNameInput] = useState("");
 
-  const [activeBrand, setActiveBrand] = useState(null);
   const router = useRouter();
   const [brandSearch, setBrandSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -680,86 +700,6 @@ export default function ScentWise() {
     const matchesCategory = categoryFilter === "all" || b.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
-
-  if (activeBrand) {
-    const brand = BRANDS.find((b) => b.id === activeBrand);
-    return (
-      <div className="min-h-screen" style={{ background: "#F9F6F1", fontFamily: "'Inter', system-ui, sans-serif" }}>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap');
-          .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
-          @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-          .fade-up { animation: fadeUp 0.5s ease-out; }
-        `}</style>
-
-        <div className="max-w-4xl mx-auto px-6 md:px-12 py-12 fade-up">
-          <button onClick={() => setActiveBrand(null)} className="flex items-center gap-2 text-xs uppercase tracking-widest mb-12 transition" style={{ color: "#7A6650" }}>
-            <ArrowLeft size={14} /> Back to all houses
-          </button>
-
-          <div className="mb-12 pb-10 border-b" style={{ borderColor: "rgba(196,168,130,0.3)" }}>
-            <p className="text-xs uppercase tracking-[0.3em] font-medium mb-3" style={{ color: "#A67C52" }}>{CATEGORY_LABELS[brand.category]} · {brand.origin}</p>
-            <h1 className="serif font-light mb-6" style={{ fontSize: "clamp(3rem, 6vw, 5rem)", color: "#2C1F0F" }}>{brand.name}</h1>
-            <p className="text-base md:text-lg leading-relaxed font-light max-w-2xl mb-6" style={{ color: "#5C4A32" }}>{brand.desc}</p>
-            <a href={brand.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest border-b pb-1 transition" style={{ color: "#8B6F47", borderColor: "#C4A882" }}>
-              Visit official boutique <ExternalLink size={12} />
-            </a>
-          </div>
-
-          {brand.perfumes && brand.perfumes.length > 0 ? (
-            <>
-              <p className="text-xs uppercase tracking-[0.3em] font-medium mb-8" style={{ color: "#A67C52" }}>Iconic fragrances</p>
-
-              <div className="space-y-4">
-                {brand.perfumes.map((p, i) => (
-                  <div key={i} className="bg-white border p-7 transition hover:shadow-lg" style={{ borderColor: "rgba(196,168,130,0.3)" }}>
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-                      <div>
-                        <h3 className="serif text-2xl mb-1" style={{ color: "#2C1F0F" }}>{p.name}</h3>
-                        <p className="text-xs uppercase tracking-widest font-medium" style={{ color: "#A67C52" }}>{p.family}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: "#A89880" }}>Retail</p>
-                        <p className="serif text-xl" style={{ color: "#5C4A32" }}>{p.price}</p>
-                      </div>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4 pt-4 border-t" style={{ borderColor: "rgba(196,168,130,0.2)" }}>
-                      <div>
-                        <p className="text-[10px] uppercase tracking-widest mb-1.5" style={{ color: "#A89880" }}>Key notes</p>
-                        <p className="text-sm font-light italic" style={{ color: "#5C4A32" }}>{p.notes}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] uppercase tracking-widest mb-1.5" style={{ color: "#A89880" }}>Best for</p>
-                        <p className="text-sm font-light" style={{ color: "#5C4A32" }}>{p.occasion}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-12 text-center text-xs font-light" style={{ color: "#A89880" }}>
-                Reference USD pricing. Check the official boutique or authorized retailers for current pricing.
-              </div>
-            </>
-          ) : (
-            <div className="border-2 border-dashed p-10 text-center" style={{ borderColor: "rgba(196,168,130,0.4)", background: "rgba(255,255,255,0.5)" }}>
-              <FlaskConical size={32} className="mx-auto mb-4 opacity-40" style={{ color: "#8B6F47" }} />
-              <h3 className="serif text-2xl mb-3 font-light" style={{ color: "#2C1F0F" }}>Deep dive coming soon</h3>
-              <p className="text-sm font-light leading-relaxed max-w-md mx-auto mb-6" style={{ color: "#7A6650" }}>
-                We're building a rich, detailed page for {brand.name} — with founder stories, perfumer credits, signature ingredients, full olfactive pyramids, and the history behind each iconic fragrance. The same depth you'll find on our Le Labo page.
-              </p>
-              <p className="text-xs font-light leading-relaxed max-w-md mx-auto mb-6" style={{ color: "#A89880" }}>
-                In the meantime, talk to the consultant for personalized recommendations from {brand.name}, or visit their official site below.
-              </p>
-              <a href={brand.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xs uppercase tracking-widest border-b pb-1 transition" style={{ color: "#8B6F47", borderColor: "#C4A882" }}>
-                Visit {brand.name} <ExternalLink size={12} />
-              </a>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   // ===== MAIN VIEW =====
   return (
@@ -826,7 +766,7 @@ export default function ScentWise() {
             <MessageCircle size={16} /> Talk to the consultant
           </button>
           <button onClick={() => scrollTo("brands")} className="inline-flex items-center gap-3 text-xs uppercase tracking-widest px-9 py-4 border transition" style={{ borderColor: "#5C4A32", color: "#5C4A32" }}>
-            <Building2 size={16} /> Explore {BRANDS.length} houses
+            <Building2 size={16} /> Explore the houses
           </button>
         </div>
         <div className="mt-16 flex flex-col items-center gap-2 relative z-10">
@@ -876,7 +816,7 @@ export default function ScentWise() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12" data-reveal>
             <p className="text-xs tracking-[0.3em] uppercase mb-4 font-medium" style={{ color: "#A67C52" }}>Encyclopedia</p>
-            <h2 className="serif font-light mb-5" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "#2C1F0F" }}>{BRANDS.length} curated houses</h2>
+            <h2 className="serif font-light mb-5" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "#2C1F0F" }}>The houses</h2>
             <p className="text-base font-light max-w-lg mx-auto" style={{ color: "#7A6650" }}>
               From house history to iconic compositions — click any maison to explore its world.
             </p>
@@ -908,7 +848,7 @@ export default function ScentWise() {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <p className="text-[10px] uppercase tracking-[0.3em] font-medium px-2 py-1 rounded" style={{ color: "#A67C52", background: "#F5F0E8" }}>{CATEGORY_LABELS[b.category]}</p>
-                    {(b.id === "lelabo" || b.id === "mfk" || b.id === "creed") && (
+                    {DEEP_DIVE_IDS.has(b.id) && (
                       <p className="text-[10px] uppercase tracking-[0.2em] font-medium px-2 py-1 rounded" style={{ color: "#F5F0E8", background: "#5C4A32" }}>Featured</p>
                     )}
                   </div>
@@ -918,7 +858,11 @@ export default function ScentWise() {
                 <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "#A89880" }}>{b.origin}</p>
                 <p className="text-sm leading-relaxed font-light" style={{ color: "#5C4A32", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{b.desc}</p>
                 <p className="text-xs mt-4 italic" style={{ color: "#8B6F47" }}>
-                  {(b.id === "lelabo" || b.id === "mfk" || b.id === "creed") ? "Full deep-dive page available" : "Brand profile · Deep dive coming soon"}
+                  {DEEP_DIVE_IDS.has(b.id)
+                    ? "Full deep-dive page available"
+                    : TIER2_IDS.has(b.id)
+                    ? "Brand profile available"
+                    : "Brand profile · Deep dive coming soon"}
                 </p>
               </button>
             ))}
