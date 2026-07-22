@@ -1,33 +1,29 @@
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, FlaskConical, Quote } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
+import { rootFamily, famFill, famText, FAMILY_LABEL } from "../../../lib/families";
 
 export const revalidate = 60;
 
-const THEMES = {
-  kraft: {
-    bg: "#F4EFE6", ink: "#1A1A1A", body: "#3A3A3A",
-    dark: "#1A1A1A", onDark: "#F4EFE6", onDarkMuted: "rgba(244,239,230,0.70)",
-    accent: "#A67C52", altBg: "#E8DFD0", mono: "mono",
-  },
-  gold: {
-    bg: "#FAF6EE", ink: "#1A1A1A", body: "#3A3026",
-    dark: "#141109", onDark: "#F8F4ED", onDarkMuted: "rgba(248,244,237,0.70)",
-    accent: "#B8954A", altBg: "#F0E9DA", mono: "mono-luxury",
-  },
-  creed: {
-    bg: "#F2EEE4", ink: "#1C2620", body: "#3A3F38",
-    dark: "#15241C", onDark: "#EFEADD", onDarkMuted: "rgba(239,234,221,0.72)",
-    accent: "#A8894E", altBg: "#E4E2D4", mono: "mono-luxury",
-  },
-};
-
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+const list = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
-  const { data } = await supabase.from("brands").select("name").eq("id", id).single();
-  return { title: data ? `${data.name} · ScentWise` : "Brand · ScentWise" };
+  const { data } = await supabase.from("brands").select("name, description").eq("id", id).single();
+  if (!data) return { title: "House" };
+  return { title: data.name, description: data.description };
+}
+
+function Mark({ className = "" }) {
+  return (
+    <span className={`mark ${className}`} aria-hidden="true">
+      <span className="t1" /><span className="t2" /><span className="t3" />
+    </span>
+  );
+}
+
+function SectionLabel({ children }) {
+  return <p className="label mb-5">{children}</p>;
 }
 
 export default async function BrandPage({ params }) {
@@ -41,7 +37,6 @@ export default async function BrandPage({ params }) {
     .from("perfumes").select("*").eq("brand_id", id).order("sort_order", { ascending: true });
   const perfumes = perfumesData || [];
 
-  const t = THEMES[brand.aesthetic_theme] || THEMES.kraft;
   const philosophy = brand.philosophy || {};
   const founders = brand.founders || [];
   const timeline = brand.timeline || [];
@@ -49,313 +44,399 @@ export default async function BrandPage({ params }) {
   const retailers = brand.retailers || [];
   const perfumer = brand.signature_perfumer;
   const visual = brand.visual_identity || {};
-  const m = t.mono;
+
+  const noses = [...new Set(perfumes.map((p) => p.perfumer).filter(Boolean))];
+  const maxNotes = Math.max(
+    1,
+    ...perfumes.flatMap((p) => ["top", "heart", "base"].map((k) => list(p.notes?.[k]).length))
+  );
 
   return (
-    <div style={{ minHeight: "100vh", background: t.bg, color: t.ink, fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cormorant:wght@300;400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-        .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
-        .mono { font-family: 'JetBrains Mono', 'Courier New', monospace; }
-        .mono-luxury { font-family: 'Cormorant', 'Cormorant Garamond', serif; letter-spacing: 0.18em; }
-        .label-line { background-image: repeating-linear-gradient(90deg, currentColor 0, currentColor 4px, transparent 4px, transparent 8px); height: 1px; }
-        details > summary { list-style: none; cursor: pointer; }
-        details > summary::-webkit-details-marker { display: none; }
-        .acc-ind::after { content: "+"; }
-        details[open] .acc-ind::after { content: "\\2014"; }
-      `}</style>
-
-      <div className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-5 flex items-center justify-between"
-        style={{ background: t.bg, backdropFilter: "blur(10px)", borderBottom: `1px solid ${t.ink}1A` }}>
-        <a href="/" className={`flex items-center gap-2 text-xs uppercase tracking-[0.2em] hover:opacity-60 transition ${m}`}>
-          <ArrowLeft size={14} /> back to scentwise
+    <div className="min-h-screen" style={{ background: "var(--paper)" }}>
+      {/* ---------- header ---------- */}
+      <header
+        className="sticky top-0 z-50 flex items-center justify-between px-5 md:px-11 py-3.5"
+        style={{ background: "var(--paper)", borderBottom: "1px solid var(--rule)" }}
+      >
+        <a href="/" className="flex items-center gap-2.5 hover:opacity-60 transition"
+           style={{ color: "var(--ink)" }}>
+          <Mark />
+          <span className="serif text-lg font-semibold">
+            Scent<span style={{ color: "var(--muted)", fontWeight: 400 }}>Wise</span>
+          </span>
         </a>
-        <span className={`text-xs uppercase tracking-[0.2em] opacity-50 hidden md:block ${m}`}>
-          brand · {brand.name}
-        </span>
-      </div>
+        <span className="label hidden md:block">{brand.name}</span>
+      </header>
 
-      <section className="pt-28 md:pt-32 pb-16 md:pb-24 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="border-2 inline-block px-8 py-6 mb-10" style={{ borderColor: t.ink, background: t.bg }}>
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] mb-2 opacity-60`}>{cap(brand.category)} house</p>
-            <h1 className="serif font-light leading-none mb-3" style={{ fontSize: "clamp(3rem, 9vw, 7rem)", letterSpacing: "0.02em" }}>{brand.name}</h1>
-            <div className="label-line mb-3"></div>
-            <p className={`${m} text-[11px] uppercase tracking-[0.2em] opacity-70`}>{brand.origin}</p>
-          </div>
-
+      {/* ---------- hero ---------- */}
+      <section
+        className="px-5 md:px-11 pt-11 md:pt-14 pb-8"
+        style={{
+          borderBottom: "1px solid var(--rule)",
+          background: "linear-gradient(180deg, var(--wash) 0%, var(--surface) 100%)",
+        }}
+      >
+        <div className="max-w-5xl">
+          <p className="label mb-6">Encyclopedia / {cap(brand.category)} house</p>
+          <h1
+            className="serif font-semibold leading-none mb-3"
+            style={{ fontSize: "clamp(2.4rem,6vw,4.1rem)", color: "var(--ink)" }}
+          >
+            {brand.name}
+          </h1>
           {brand.tagline && (
-            <p className="serif italic font-light max-w-3xl mb-12" style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)", lineHeight: 1.4, color: t.body }}>
-              "{brand.tagline}"
+            <p
+              className="serif italic mb-7 max-w-2xl"
+              style={{ fontSize: "clamp(1.05rem,2.2vw,1.32rem)", color: "var(--muted)" }}
+            >
+              {brand.tagline}
             </p>
           )}
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl">
-            <div className="border-l-2 pl-4" style={{ borderColor: t.ink }}>
-              <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-2`}>founded</p>
-              <p className="text-base">{brand.origin}</p>
-            </div>
-            {brand.birthplace && (
-              <div className="border-l-2 pl-4" style={{ borderColor: t.ink }}>
-                <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-2`}>spirit of</p>
-                <p className="text-base">{brand.birthplace}</p>
-              </div>
-            )}
-            {perfumes.length > 0 && (
-              <div className="border-l-2 pl-4" style={{ borderColor: t.ink }}>
-                <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-2`}>collection</p>
-                <p className="text-base">{perfumes.length} signature scents</p>
-              </div>
-            )}
+          <div
+            className="flex flex-wrap gap-x-9 gap-y-5 pt-5"
+            style={{ borderTop: "1px solid var(--rule)" }}
+          >
+            <Meta k="Founded" v={brand.origin} />
+            {brand.birthplace && <Meta k="Spirit of" v={brand.birthplace} />}
+            {founders[0] && <Meta k="Founder" v={founders[0].name} />}
+            {perfumes.length > 0 && <Meta k="Fragrances" v={perfumes.length} />}
+            {noses.length > 0 && <Meta k="Perfumers" v={noses.length} />}
           </div>
 
           {brand.official_url && (
-            <a href={brand.official_url} target="_blank" rel="noopener noreferrer"
-              className={`inline-flex items-center gap-2 mt-12 ${m} text-xs uppercase tracking-[0.2em] border-b pb-1 hover:opacity-60 transition`}
-              style={{ borderColor: t.ink }}>
-              visit official site <ExternalLink size={12} />
+            <a
+              href={brand.official_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-8 label hover:opacity-60 transition"
+              style={{ color: "var(--ink)", borderBottom: "1px solid var(--rule-firm)", paddingBottom: 3 }}
+            >
+              Visit the official site
             </a>
           )}
         </div>
       </section>
 
-       {!philosophy.headline && !philosophy.body && brand.description && (
-       <section className="px-6 md:px-10 pb-16 md:pb-24" style={{ background: t.bg }}>
-           <div className="max-w-3xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— about the house</p>
-            <p className="text-base md:text-lg font-light leading-relaxed" style={{ color: t.body }}>{brand.description}</p>
-           </div>
-       </section>
-      )}
-
-      {(philosophy.headline || philosophy.body) && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.dark, color: t.onDark }}>
-          <div className="max-w-4xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— philosophy</p>
-            {philosophy.headline && (
-              <h2 className="serif font-light mb-12" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)", lineHeight: 1.2 }}>
-                {philosophy.headline}
-              </h2>
-            )}
-            <div className="space-y-6 text-base md:text-lg font-light leading-relaxed" style={{ color: t.onDarkMuted }}>
-              {philosophy.body && <p>{philosophy.body}</p>}
-              {philosophy.body2 && <p>{philosophy.body2}</p>}
-            </div>
-            {philosophy.quote && (
-              <blockquote className="mt-16 pl-8 border-l-2" style={{ borderColor: t.accent }}>
-                <Quote size={20} style={{ color: t.accent }} className="mb-3" />
-                <p className="serif italic font-light text-xl md:text-2xl mb-3" style={{ color: t.onDark, lineHeight: 1.5 }}>
-                  "{philosophy.quote}"
-                </p>
-                {philosophy.quoteBy && (
-                  <p className={`${m} text-xs uppercase tracking-[0.2em]`} style={{ color: t.onDarkMuted }}>— {philosophy.quoteBy}</p>
-                )}
-              </blockquote>
-            )}
+      {/* ---------- philosophy ---------- */}
+      {(philosophy.headline || philosophy.body || brand.description) && (
+        <Section>
+          <SectionLabel>The house</SectionLabel>
+          {philosophy.headline ? (
+            <h2 className="serif font-semibold mb-6 max-w-2xl"
+                style={{ fontSize: "clamp(1.5rem,3vw,2.1rem)", color: "var(--ink)", textWrap: "balance" }}>
+              {philosophy.headline}
+            </h2>
+          ) : null}
+          <div className="max-w-2xl space-y-4" style={{ color: "var(--muted)" }}>
+            {philosophy.body ? <p>{philosophy.body}</p> : <p>{brand.description}</p>}
+            {philosophy.body2 && <p>{philosophy.body2}</p>}
           </div>
-        </section>
+          {philosophy.quote && (
+            <blockquote className="mt-9 pl-6 max-w-2xl"
+                        style={{ borderLeft: "2px solid var(--rule-firm)" }}>
+              <p className="serif italic text-xl" style={{ color: "var(--ink-soft)" }}>
+                {philosophy.quote}
+              </p>
+              {philosophy.quoteBy && <p className="label mt-3">{philosophy.quoteBy}</p>}
+            </blockquote>
+          )}
+        </Section>
       )}
 
-      {founders.length > 0 && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.bg }}>
-          <div className="max-w-6xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— the founders</p>
-            <h2 className="serif font-light mb-16" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>The people behind the house.</h2>
-            <div className="grid md:grid-cols-2 gap-12 md:gap-20">
-              {founders.map((f, i) => (
-                <div key={i}>
-                  <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-3`}>{String(i + 1).padStart(2, "0")} / {String(founders.length).padStart(2, "0")}</p>
-                  <h3 className="serif text-3xl md:text-4xl mb-2 font-light">{f.name}</h3>
-                  <p className={`${m} text-xs uppercase tracking-[0.15em] mb-6 opacity-70`}>{f.role}</p>
-                  <div className="label-line mb-6"></div>
-                  <p className="text-base font-light leading-relaxed" style={{ color: t.body }}>{f.bio}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {timeline.length > 0 && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.altBg }}>
-          <div className="max-w-4xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— timeline</p>
-            <h2 className="serif font-light mb-16" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>A history, in moments.</h2>
-            <div className="space-y-10">
-              {timeline.map((tl, i) => (
-                <div key={i} className="grid grid-cols-[100px_1fr] md:grid-cols-[140px_1fr] gap-6 md:gap-10 items-start">
-                  <p className={`${m} text-base md:text-lg font-medium`} style={{ color: t.ink }}>{tl.year}</p>
-                  <div className="border-l-2 pl-6" style={{ borderColor: t.ink }}>
-                    <p className="text-base md:text-lg font-light leading-relaxed">{tl.event}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {perfumer && perfumer.name && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.bg }}>
-          <div className="max-w-5xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— principal nose</p>
-            <h2 className="serif font-light mb-16" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>The nose behind the work.</h2>
-            <div className="border-2 p-8 md:p-12" style={{ borderColor: t.ink }}>
-              <div className="flex items-start gap-4 mb-6">
-                <FlaskConical size={32} style={{ color: t.ink }} />
-                <div>
-                  <h3 className="serif text-3xl md:text-4xl font-light mb-2">{perfumer.name}</h3>
-                  {perfumer.title && <p className={`${m} text-xs uppercase tracking-[0.15em] opacity-70`}>{perfumer.title}</p>}
-                </div>
-              </div>
-              <div className="label-line mb-6"></div>
-              <p className="text-base md:text-lg font-light leading-relaxed" style={{ color: t.body }}>{perfumer.bio}</p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {ingredients.length > 0 && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.dark, color: t.onDark }}>
-          <div className="max-w-6xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] mb-6`} style={{ color: t.onDarkMuted }}>— signature ingredients</p>
-            <h2 className="serif font-light mb-16" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>The materials that define the house.</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-10">
-              {ingredients.map((ing, i) => (
-                <div key={i}>
-                  <p className={`${m} text-[10px] uppercase tracking-[0.2em] mb-2`} style={{ color: t.onDarkMuted }}>{String(i + 1).padStart(2, "0")}</p>
-                  <h4 className="serif text-2xl mb-3 font-light" style={{ color: t.onDark }}>{ing.name}</h4>
-                  <p className="text-sm font-light leading-relaxed" style={{ color: t.onDarkMuted }}>{ing.desc}</p>
-                </div>
-              ))}
-            </div>
-            {brand.naming_convention && (
-              <div className="mt-20 pt-10 border-t" style={{ borderColor: "rgba(255,255,255,0.15)" }}>
-                <p className={`${m} text-[10px] uppercase tracking-[0.2em] mb-4`} style={{ color: t.onDarkMuted }}>— naming convention</p>
-                <p className="text-base md:text-lg font-light leading-relaxed max-w-3xl" style={{ color: t.onDarkMuted }}>{brand.naming_convention}</p>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
+      {/* ---------- compositions ---------- */}
       {perfumes.length > 0 && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.bg }}>
-          <div className="max-w-6xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— the compositions</p>
-            <h2 className="serif font-light mb-6" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>The compositions.</h2>
-            <p className="text-base md:text-lg font-light max-w-2xl mb-16" style={{ color: t.body }}>
-              Each fragrance is a story. Open any composition to read its origin, its perfumer's intent, and the full pyramid.
-            </p>
+        <section style={{ background: "var(--wash)", borderTop: "1px solid var(--rule)" }}>
+          <div className="px-5 md:px-11 pt-11 pb-5 flex items-baseline justify-between gap-4 flex-wrap">
+            <div>
+              <SectionLabel>The compositions</SectionLabel>
+              <h2 className="serif font-semibold" style={{ fontSize: "clamp(1.5rem,3vw,2.1rem)" }}>
+                {perfumes.length} {perfumes.length === 1 ? "fragrance" : "fragrances"}
+              </h2>
+            </div>
+            <span className="label">Open a row for the full pyramid</span>
+          </div>
 
-            <div className="space-y-3">
-              {perfumes.map((p, i) => {
-                const notes = p.notes || {};
-                return (
-                  <details key={p.id} style={{ borderWidth: 2, borderStyle: "solid", borderColor: t.ink, background: t.bg }}>
-                    <summary className="p-6 md:p-8">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-baseline gap-4 md:gap-8 flex-wrap">
-                          <span className={`${m} text-xs md:text-sm opacity-50`}>{String(i + 1).padStart(2, "0")}</span>
-                          <h3 className="serif text-2xl md:text-4xl font-light tracking-wide">{p.name}</h3>
-                          <span className={`${m} text-xs uppercase tracking-[0.15em] opacity-60 hidden md:inline`}>{p.family} · {p.year}</span>
-                        </div>
-                        <span className={`acc-ind ${m} text-xs`}></span>
-                      </div>
-                      <p className={`${m} text-xs uppercase tracking-[0.15em] opacity-60 md:hidden mt-2`}>{p.family} · {p.year}</p>
-                    </summary>
+          <div style={{ background: "var(--surface)", borderTop: "1px solid var(--rule)" }}>
+            {/* column headings, desktop only */}
+            <div
+              className="comp-row hidden md:grid px-11 py-2.5 label"
+              style={{ borderBottom: "1px solid var(--rule)" }}
+            >
+              <span /><span>Fragrance</span><span className="wide">Year</span>
+              <span className="wide">Family</span><span className="wide">Perfumer</span>
+              <span className="wide">Pyramid</span><span />
+            </div>
 
-                    <div className="p-6 md:p-10 border-t-2" style={{ borderColor: t.ink, background: "#ffffff", color: "#1A1A1A" }}>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10 pb-8 border-b" style={{ borderColor: "rgba(0,0,0,0.15)" }}>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>perfumer</p><p className="text-sm font-medium">{p.perfumer || "Undisclosed"}</p></div>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>launched</p><p className="text-sm font-medium">{p.year || "—"}</p></div>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>sillage</p><p className="text-sm font-medium">{p.sillage || "—"}</p></div>
-                        <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mb-1`}>longevity</p><p className="text-sm font-medium">{p.longevity || "—"}</p></div>
-                      </div>
+            {perfumes.map((p, i) => {
+              const r = rootFamily(p.family);
+              const tiers = [
+                ["Top", list(p.notes?.top)],
+                ["Heart", list(p.notes?.heart)],
+                ["Base", list(p.notes?.base)],
+              ];
+              return (
+                <details key={p.id} className="comp">
+                  <summary className="comp-row px-5 md:px-11 py-3.5">
+                    <span className="mono tnum text-[11px]" style={{ color: "var(--faint)" }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
 
+                    <span className="min-w-0">
+                      <span className="serif block font-semibold" style={{ fontSize: "17px" }}>
+                        {p.name}
+                      </span>
                       {p.inspiration && (
-                        <div className="mb-10">
-                          <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-3`}>— inspiration</p>
-                          <p className="serif italic text-lg md:text-xl font-light leading-relaxed" style={{ color: "#3A3A3A" }}>{p.inspiration}</p>
-                        </div>
+                        <span className="block text-[12.5px] mt-0.5" style={{ color: "var(--muted)" }}>
+                          {p.inspiration}
+                        </span>
                       )}
+                      <span className="narrow label mt-1.5 block" style={{ color: famText(r) }}>
+                        {FAMILY_LABEL[r]} · {p.year || "—"}
+                      </span>
+                    </span>
 
-                      {p.creation_story && (
-                        <div className="mb-10">
-                          <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-3`}>— the creation</p>
-                          <p className="text-base font-light leading-relaxed" style={{ color: "#3A3A3A" }}>{p.creation_story}</p>
-                        </div>
-                      )}
+                    <span className="wide mono tnum text-[12px]" style={{ color: "var(--muted)" }}>
+                      {p.year || "—"}
+                    </span>
 
-                      <div className="mb-10">
-                        <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-4`}>— olfactive pyramid</p>
-                        <div className="border-l-2 pl-6 space-y-5" style={{ borderColor: t.ink }}>
-                          <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-60 mb-1`}>top notes</p><p className="serif text-lg font-light italic">{notes.top}</p></div>
-                          <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-60 mb-1`}>heart notes</p><p className="serif text-lg font-light italic">{notes.heart}</p></div>
-                          <div><p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-60 mb-1`}>base notes</p><p className="serif text-lg font-light italic">{notes.base}</p></div>
+                    <span className="wide label" style={{ color: famText(r), fontWeight: 500 }}>
+                      <i
+                        className="inline-block w-2 h-2 rounded-[2px] mr-1.5 align-baseline"
+                        style={{ background: famFill(r) }}
+                      />
+                      {FAMILY_LABEL[r]}
+                    </span>
+
+                    <span className="wide text-[12.5px] truncate" style={{ color: "var(--muted)" }}>
+                      {p.perfumer || "Undisclosed"}
+                    </span>
+
+                    <span className="wide">
+                      <span className="pyr" title="notes per tier">
+                        {tiers.map(([t, v]) => (
+                          <i
+                            key={t}
+                            style={{
+                              background: famFill(r),
+                              width: `${Math.round((v.length / maxNotes) * 26) + 4}px`,
+                            }}
+                          />
+                        ))}
+                      </span>
+                    </span>
+
+                    <span className="plus mono text-sm" style={{ color: "var(--faint)" }} />
+                  </summary>
+
+                  <div className="px-5 md:px-11 pb-7 pt-1">
+                    <div
+                      className="grid md:grid-cols-[1.15fr_1fr] gap-7 p-5 md:p-6"
+                      style={{ background: "var(--wash)", border: "1px solid var(--rule)" }}
+                    >
+                      <div className="space-y-3.5">
+                        {p.creation_story && (
+                          <p style={{ color: "var(--muted)", fontSize: "13.5px" }}>{p.creation_story}</p>
+                        )}
+                        <div className="flex flex-wrap gap-x-7 gap-y-3 pt-1">
+                          <Meta k="Perfumer" v={p.perfumer || "Undisclosed"} small />
+                          <Meta k="Launched" v={p.year || "—"} small />
+                          <Meta k="Sillage" v={p.sillage || "—"} small />
+                          <Meta k="Longevity" v={p.longevity || "—"} small />
                         </div>
+                        {p.best_for && (
+                          <div className="pt-1">
+                            <p className="label mb-1">Best for</p>
+                            <p style={{ color: "var(--muted)", fontSize: "13.5px" }}>{p.best_for}</p>
+                          </div>
+                        )}
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-8 pt-8 border-t" style={{ borderColor: "rgba(0,0,0,0.15)" }}>
-                        <div>
-                          <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-3`}>— best for</p>
-                          <p className="text-base font-light leading-relaxed" style={{ color: "#3A3A3A" }}>{p.best_for}</p>
-                        </div>
-                        <div>
-                          <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-50 mb-3`}>— price</p>
-                          <p className="serif text-2xl font-light">{p.price || "See retailer"}</p>
-                          <p className={`${m} text-[10px] uppercase tracking-[0.15em] opacity-50 mt-2`}>eau de parfum</p>
-                        </div>
+                      <div className="space-y-3">
+                        {tiers.map(([t, v]) => (
+                          <div key={t} className="grid gap-3" style={{ gridTemplateColumns: "48px 1fr" }}>
+                            <span className="label pt-1">{t}</span>
+                            <span className="flex flex-wrap gap-1.5">
+                              {v.length ? (
+                                v.map((n, k) => (
+                                  <span
+                                    key={k}
+                                    className="text-[12.5px] px-2 py-0.5 rounded-[3px]"
+                                    style={{
+                                      background: "var(--surface)",
+                                      border: "1px solid var(--rule)",
+                                      color: "var(--ink-soft)",
+                                    }}
+                                  >
+                                    {n}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-[12.5px]" style={{ color: "var(--faint)" }}>
+                                  Not published
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </details>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {visual.description && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.altBg }}>
-          <div className="max-w-4xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— visual identity</p>
-            <h2 className="serif font-light mb-12" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>The world of the house.</h2>
-            <p className="text-base md:text-lg font-light leading-relaxed" style={{ color: t.body }}>{visual.description}</p>
-          </div>
-        </section>
-      )}
-
-      {retailers.length > 0 && (
-        <section className="px-6 md:px-10 py-20 md:py-28" style={{ background: t.bg }}>
-          <div className="max-w-4xl mx-auto">
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-6`}>— where to find it</p>
-            <h2 className="serif font-light mb-12" style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>Authorized retailers.</h2>
-            <div className="space-y-2">
-              {retailers.map((r, i) => (
-                <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-between gap-4 p-5 border-2 transition hover:opacity-80 group" style={{ borderColor: t.ink }}>
-                  <div className="flex-1">
-                    <p className="serif text-xl font-light mb-1">{r.name}</p>
-                    <p className={`${m} text-xs uppercase tracking-[0.15em] opacity-60`}>{r.note}</p>
                   </div>
-                  <ExternalLink size={16} className="opacity-40 group-hover:opacity-100 transition" />
-                </a>
-              ))}
-            </div>
+                </details>
+              );
+            })}
           </div>
         </section>
       )}
 
-      <footer className="px-6 md:px-10 py-12 text-center" style={{ background: t.dark, color: t.onDark }}>
-        <div className="max-w-4xl mx-auto">
-          <div className="border-2 inline-block px-8 py-4" style={{ borderColor: t.onDark }}>
-            <p className={`${m} text-[10px] uppercase tracking-[0.3em] opacity-50 mb-1`}>{brand.name} · brand profile</p>
-            <p className="serif text-xl font-light">curated by ScentWise</p>
+      {/* ---------- founders ---------- */}
+      {founders.length > 0 && (
+        <Section>
+          <SectionLabel>The founders</SectionLabel>
+          <div className="grid md:grid-cols-2 gap-x-14 gap-y-9 max-w-5xl">
+            {founders.map((f, i) => (
+              <div key={i}>
+                <h3 className="serif text-2xl font-semibold mb-1">{f.name}</h3>
+                <p className="label mb-3">{f.role}</p>
+                <p style={{ color: "var(--muted)", fontSize: "14px" }}>{f.bio}</p>
+              </div>
+            ))}
           </div>
-          <p className={`${m} text-[10px] uppercase tracking-[0.2em] opacity-40 mt-6`}>all prices in usd · reference only · check official retailers for current pricing</p>
-        </div>
+        </Section>
+      )}
+
+      {/* ---------- ingredients ---------- */}
+      {ingredients.length > 0 && (
+        <Section wash>
+          <SectionLabel>Signature materials</SectionLabel>
+          <h2 className="serif font-semibold mb-8" style={{ fontSize: "clamp(1.5rem,3vw,2.1rem)" }}>
+            What the house is built from.
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-9 gap-y-8">
+            {ingredients.map((ing, i) => (
+              <div key={i}>
+                <p className="mono tnum text-[11px] mb-2" style={{ color: "var(--faint)" }}>
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h4 className="serif text-lg font-semibold mb-2">{ing.name}</h4>
+                <p style={{ color: "var(--muted)", fontSize: "13.5px" }}>{ing.desc}</p>
+              </div>
+            ))}
+          </div>
+          {brand.naming_convention && (
+            <div className="mt-11 pt-7 max-w-3xl" style={{ borderTop: "1px solid var(--rule)" }}>
+              <p className="label mb-2">How the fragrances are named</p>
+              <p style={{ color: "var(--muted)" }}>{brand.naming_convention}</p>
+            </div>
+          )}
+        </Section>
+      )}
+
+      {/* ---------- timeline ---------- */}
+      {timeline.length > 0 && (
+        <Section>
+          <SectionLabel>A history, in moments</SectionLabel>
+          <div className="max-w-3xl">
+            {timeline.map((tl, i) => (
+              <div
+                key={i}
+                className="grid gap-6 py-4"
+                style={{
+                  gridTemplateColumns: "72px 1fr",
+                  borderTop: i === 0 ? "none" : "1px solid var(--rule)",
+                }}
+              >
+                <span className="mono tnum text-[13px] font-medium" style={{ color: "var(--ink)" }}>
+                  {tl.year}
+                </span>
+                <span style={{ color: "var(--muted)" }}>{tl.event}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* ---------- principal nose ---------- */}
+      {perfumer?.name && (
+        <Section wash>
+          <SectionLabel>Principal nose</SectionLabel>
+          <div className="max-w-3xl">
+            <h3 className="serif text-2xl font-semibold mb-1">{perfumer.name}</h3>
+            {perfumer.title && <p className="label mb-4">{perfumer.title}</p>}
+            <p style={{ color: "var(--muted)" }}>{perfumer.bio}</p>
+          </div>
+        </Section>
+      )}
+
+      {/* ---------- visual identity ---------- */}
+      {visual.description && (
+        <Section>
+          <SectionLabel>The look of the house</SectionLabel>
+          <p className="max-w-2xl" style={{ color: "var(--muted)" }}>{visual.description}</p>
+        </Section>
+      )}
+
+      {/* ---------- retailers ---------- */}
+      {retailers.length > 0 && (
+        <Section wash>
+          <SectionLabel>Where to find it</SectionLabel>
+          <div className="max-w-3xl">
+            {retailers.map((r, i) => (
+              <a
+                key={i}
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-baseline justify-between gap-5 py-3.5 hover:opacity-60 transition"
+                style={{ borderBottom: "1px solid var(--rule)" }}
+              >
+                <span className="serif text-lg font-semibold">{r.name}</span>
+                <span className="label">{r.note}</span>
+              </a>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {/* ---------- footer ---------- */}
+      <footer
+        className="px-5 md:px-11 py-11"
+        style={{ borderTop: "1px solid var(--rule)", background: "var(--surface)" }}
+      >
+        <a href="/" className="inline-flex items-center gap-2.5 mb-4" style={{ color: "var(--ink)" }}>
+          <Mark />
+          <span className="serif text-lg font-semibold">
+            Scent<span style={{ color: "var(--muted)", fontWeight: 400 }}>Wise</span>
+          </span>
+        </a>
+        <p className="label max-w-xl" style={{ lineHeight: 1.8 }}>
+          Reference only. ScentWise is independent and not affiliated with the houses it documents.
+          Prices, where shown, are in USD and change without notice.
+        </p>
       </footer>
+    </div>
+  );
+}
+
+function Section({ children, wash = false }) {
+  return (
+    <section
+      className="px-5 md:px-11 py-11 md:py-14"
+      style={{
+        background: wash ? "var(--wash)" : "var(--paper)",
+        borderTop: "1px solid var(--rule)",
+      }}
+    >
+      <div className="max-w-6xl">{children}</div>
+    </section>
+  );
+}
+
+function Meta({ k, v, small = false }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="label">{k}</span>
+      <span style={{ fontSize: small ? "13px" : "14px", color: "var(--ink)" }}>{v}</span>
     </div>
   );
 }

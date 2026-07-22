@@ -1,26 +1,119 @@
 @import "tailwindcss";
 
+/* ScentWise design tokens.
+   One light system for the whole site. The only colour that carries meaning is the
+   olfactory family accent, so it never has to compete with a decorative palette. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  --ink:       #191A1E;
+  --ink-soft:  #4A4D55;
+  --muted:     #6E717A;
+  --faint:     #A2A5AC;
+
+  --paper:     #FDFDFB;
+  --surface:   #FFFFFF;
+  --wash:      #F5F7F4;
+  --rule:      #E7E7E2;
+  --rule-firm: #D2D2CC;
+
+  /* family accents, fill tone: bars, chips, marks */
+  --fam-floral:   #E8407E;
+  --fam-woody:    #C2761F;
+  --fam-amber:    #F5A81B;
+  --fam-citrus:   #B9C41C;
+  --fam-incense:  #7B62E0;
+  --fam-chypre:   #16A86B;
+  --fam-leather:  #E04A3F;
+  --fam-aromatic: #12A0CE;
+
+  /* family accents, text tone: all clear WCAG AA on --paper */
+  --fam-floral-t:   #C22462;
+  --fam-woody-t:    #8F5713;
+  --fam-amber-t:    #8F5F02;
+  --fam-citrus-t:   #656C08;
+  --fam-incense-t:  #5B43C0;
+  --fam-chypre-t:   #0B7D4F;
+  --fam-leather-t:  #B8322A;
+  --fam-aromatic-t: #0A7699;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-fraunces);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
 }
+
+/* ---------- type roles ---------- */
+.serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.018em;
+}
+.mono {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+}
+.label {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ---------- the mark: three tiers of the fragrance pyramid ---------- */
+.mark { display: inline-flex; flex-direction: column; gap: 3px; }
+.mark span { display: block; height: 3px; border-radius: 1px; background: currentColor; }
+.mark .t1 { width: 9px; }
+.mark .t2 { width: 14px; }
+.mark .t3 { width: 19px; }
+
+/* ---------- composition rows (details/summary, no client JS) ---------- */
+.comp { border-bottom: 1px solid var(--rule); }
+.comp > summary { list-style: none; cursor: pointer; }
+.comp > summary::-webkit-details-marker { display: none; }
+.comp > summary:hover { background: var(--wash); }
+.comp[open] > summary { background: var(--wash); }
+.comp .plus::after { content: "+"; }
+.comp[open] .plus::after { content: "\2013"; }
+
+/* One grid, two column sets. Cells that are desktop-only are display:none on small
+   screens, which drops them out of the grid flow entirely. */
+.comp-row {
+  display: grid;
+  align-items: baseline;
+  gap: 5px 14px;
+  grid-template-columns: 26px 1fr 16px;
+}
+.comp-row > .wide { display: none; }
+@media (min-width: 768px) {
+  .comp-row { grid-template-columns: 30px 1fr 54px 124px 132px 100px 16px; }
+  .comp-row > .wide { display: block; }
+  .comp-row > .narrow { display: none; }
+}
+
+.pyr { display: flex; gap: 3px; align-items: center; }
+.pyr i { display: block; height: 20px; border-radius: 1px; }
+
+.fp { display: flex; gap: 2px; height: 4px; }
+.fp i { display: block; flex: 1; border-radius: 1px; }
+
+/* ---------- reveal-on-scroll, opt-in and motion safe ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] { opacity: 0; transform: translateY(12px); }
+  [data-reveal].shown { opacity: 1; transform: none;
+    transition: opacity .5s ease, transform .5s cubic-bezier(.22,1,.36,1); }
+}
+
+:focus-visible { outline: 2px solid var(--fam-aromatic-t); outline-offset: 2px; }
