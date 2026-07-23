@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FAMILIES, FAMILY_LABEL, famFill, famText } from "../lib/families";
 
@@ -24,6 +24,13 @@ const FAMILY_PRIMER = {
   leather: "Birch tar, suede, castoreum. Animalic and smoky, the most divisive family.",
   aromatic: "Lavender, sage, rosemary. Herbal and clean, the heart of the fougère.",
 };
+
+const OPENERS = [
+  "My first niche fragrance",
+  "Something for the office",
+  "A cold-weather evening",
+  "I like Aventus, what else?",
+];
 
 function Mark({ className = "" }) {
   return (
@@ -64,14 +71,15 @@ function useScrollReveal() {
   }, []);
 }
 
-function Consultant() {
+function Consultant({ seed, onSeedConsumed }) {
   const [messages, setMessages] = useState([
     { role: "bot", text: "Tell me what you are after: an occasion, a scent you already love, a feeling you want to wear, or a budget. I will work from there." },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  const endRef = React.useRef(null);
+  const endRef = useRef(null);
+  const sendRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -104,6 +112,14 @@ function Consultant() {
     }
     setLoading(false);
   }
+  sendRef.current = send;
+
+  // A question asked from the hero arrives here as a seed.
+  useEffect(() => {
+    if (!seed) return;
+    sendRef.current?.(seed);
+    onSeedConsumed?.();
+  }, [seed, onSeedConsumed]);
 
   return (
     <div style={{ background: "var(--surface)", border: "1px solid var(--rule-firm)" }}>
@@ -132,15 +148,15 @@ function Consultant() {
         <div ref={endRef} />
       </div>
 
-      {messages.length <= 1 && (
+      {messages.length <= 1 && !loading && (
         <div className="px-4 md:px-6 py-3 flex flex-wrap gap-2" style={{ borderTop: "1px solid var(--rule)" }}>
-          {["My first niche fragrance", "Something for the office", "A cold-weather evening", "I like Aventus, what else?"].map((s) => (
+          {OPENERS.map((s) => (
             <button
               key={s}
               onClick={() => send(s)}
               disabled={loading}
-              className="px-3 py-1.5 text-[12.5px] transition disabled:opacity-50 hover:opacity-70"
-              style={{ border: "1px solid var(--rule-firm)", color: "var(--muted)" }}
+              className="px-3 py-2 text-[12.5px] transition disabled:opacity-50 hover:opacity-70"
+              style={{ border: "1px solid var(--rule-firm)", color: "var(--muted)", minHeight: 36 }}
             >
               {s}
             </button>
@@ -177,17 +193,39 @@ export default function HomeClient({ brands }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const [family, setFamily] = useState(null);
+  const [seed, setSeed] = useState(null);
+  const [heroAsk, setHeroAsk] = useState("");
 
   useScrollReveal();
 
-  const filtered = brands.filter((b) => {
+  function askConsultant(text) {
+    const q = text.trim();
+    if (!q) return;
+    setSeed(q);
+    setHeroAsk("");
+    document.getElementById("consultant")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function pickFamily(f) {
+    setFamily((cur) => (cur === f ? null : f));
+    document.getElementById("houses")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Houses that survive all three filters, each carrying the fragrances that
+  // explain a text match so the card can show why it is in the results.
+  const results = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const matchesSearch =
-      !q ||
-      b.name.toLowerCase().includes(q) ||
-      b.perfumes.some((p) => p.name.toLowerCase().includes(q));
-    return matchesSearch && (category === "all" || b.category === category);
-  });
+    return brands
+      .map((b) => {
+        const hits = q ? b.perfumes.filter((p) => p.haystack.includes(q)) : [];
+        const matches = !q || b.haystack.includes(q) || hits.length > 0;
+        return { ...b, hits, matches };
+      })
+      .filter((b) => b.matches)
+      .filter((b) => category === "all" || b.category === category)
+      .filter((b) => !family || b.families.includes(family));
+  }, [brands, search, category, family]);
 
   const totalFragrances = brands.reduce((n, b) => n + b.perfumes.length, 0);
   const oldest = brands
@@ -195,24 +233,32 @@ export default function HomeClient({ brands }) {
     .filter(Boolean)
     .sort((a, b) => a - b)[0];
 
+  const filtersOn = search.trim() || category !== "all" || family;
+
   return (
     <div className="min-h-screen" style={{ background: "var(--paper)" }}>
       <header
-        className="sticky top-0 z-50 flex items-center justify-between px-5 md:px-11 py-3.5"
+        className="sticky top-0 z-50 flex items-center justify-between gap-3 px-4 md:px-11 py-3"
         style={{ background: "var(--paper)", borderBottom: "1px solid var(--rule)" }}
       >
-        <a href="#top"><Wordmark /></a>
-        <nav className="flex gap-6 items-center">
-          <a href="#families" className="label hidden md:block hover:opacity-60">Families</a>
-          <a href="#consultant" className="label hidden md:block hover:opacity-60">Consultant</a>
-          <a href="#houses" className="label hover:opacity-60">Houses</a>
+        <a href="#top" className="py-1.5"><Wordmark /></a>
+        <nav className="flex gap-3.5 md:gap-6 items-center">
+          <a href="#families" className="label py-2.5 hover:opacity-60">Families</a>
+          <a href="#houses" className="label py-2.5 hover:opacity-60">Houses</a>
+          <a
+            href="#consultant"
+            className="label px-3 py-2.5"
+            style={{ background: "var(--ink)", color: "var(--paper)" }}
+          >
+            Ask
+          </a>
         </nav>
       </header>
 
       {/* ---------- hero ---------- */}
       <section
         id="top"
-        className="px-5 md:px-11 pt-16 md:pt-24 pb-12"
+        className="px-5 md:px-11 pt-14 md:pt-20 pb-11"
         style={{
           borderBottom: "1px solid var(--rule)",
           background: "linear-gradient(180deg, var(--wash) 0%, var(--surface) 100%)",
@@ -222,34 +268,73 @@ export default function HomeClient({ brands }) {
           <p className="label mb-6">The perfume encyclopedia</p>
           <h1
             className="serif font-semibold mb-5"
-            style={{ fontSize: "clamp(2.5rem,6.4vw,4.6rem)", lineHeight: 1.02, color: "var(--ink)", textWrap: "balance", maxWidth: "15ch" }}
+            style={{ fontSize: "clamp(2.4rem,6.2vw,4.4rem)", lineHeight: 1.03, color: "var(--ink)", textWrap: "balance", maxWidth: "15ch" }}
           >
             Every house has an accent. Learn to hear them.
           </h1>
           <p className="mb-8 max-w-xl" style={{ color: "var(--muted)", fontSize: "16.5px" }}>
             {brands.length} houses of niche and luxury perfumery, each with its history, its materials
-            and its fragrances opened up note by note. Start with a house you already love, or with
-            something you cannot name yet.
+            and its fragrances opened up note by note.
           </p>
 
-          <div className="flex flex-wrap gap-2.5 mb-11">
+          {/* ask the consultant, from the first screen */}
+          <div className="max-w-xl">
+            <label htmlFor="hero-ask" className="label block mb-2.5">
+              Not sure where to start? Ask.
+            </label>
+            <div className="flex" style={{ border: "1px solid var(--rule-firm)", background: "var(--surface)" }}>
+              <input
+                id="hero-ask"
+                type="text"
+                value={heroAsk}
+                onChange={(e) => setHeroAsk(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && askConsultant(heroAsk)}
+                placeholder="A gift for my father, he wears Dior Sauvage"
+                maxLength={500}
+                className="flex-1 min-w-0 px-4 outline-none text-[14px] bg-transparent"
+                style={{ color: "var(--ink)", minHeight: 48 }}
+              />
+              <button
+                onClick={() => askConsultant(heroAsk)}
+                disabled={!heroAsk.trim()}
+                className="px-5 label transition disabled:opacity-40"
+                style={{ background: "var(--ink)", color: "var(--paper)", minHeight: 48 }}
+              >
+                Ask
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {OPENERS.slice(0, 3).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => askConsultant(s)}
+                  className="px-3 text-[12.5px] transition hover:opacity-70"
+                  style={{ border: "1px solid var(--rule)", color: "var(--muted)", minHeight: 36 }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2.5 mt-9">
             <a
               href="#houses"
-              className="px-5 py-3 label"
-              style={{ background: "var(--ink)", color: "var(--paper)" }}
+              className="px-5 label flex items-center"
+              style={{ border: "1px solid var(--rule-firm)", color: "var(--ink)", minHeight: 46 }}
             >
-              Browse the houses
+              Browse all {brands.length} houses
             </a>
             <a
               href="#families"
-              className="px-5 py-3 label"
-              style={{ border: "1px solid var(--rule-firm)", color: "var(--ink)" }}
+              className="px-5 label flex items-center"
+              style={{ border: "1px solid var(--rule-firm)", color: "var(--ink)", minHeight: 46 }}
             >
               New to this? Start here
             </a>
           </div>
 
-          <div className="flex flex-wrap gap-x-11 gap-y-5 pt-6" style={{ borderTop: "1px solid var(--rule)" }}>
+          <div className="flex flex-wrap gap-x-11 gap-y-5 pt-9 mt-9" style={{ borderTop: "1px solid var(--rule)" }}>
             <Figure n={brands.length} l="houses" />
             <Figure n={totalFragrances} l="fragrances" />
             {oldest && <Figure n={oldest} l="oldest house" />}
@@ -258,7 +343,7 @@ export default function HomeClient({ brands }) {
         </div>
       </section>
 
-      {/* ---------- families primer ---------- */}
+      {/* ---------- families primer, now a filter ---------- */}
       <section id="families" className="px-5 md:px-11 py-12 md:py-16" style={{ borderBottom: "1px solid var(--rule)" }}>
         <div className="max-w-6xl" data-reveal>
           <p className="label mb-5">The vocabulary</p>
@@ -266,21 +351,34 @@ export default function HomeClient({ brands }) {
             Eight families, and what they actually smell like.
           </h2>
           <p className="mb-9 max-w-2xl" style={{ color: "var(--muted)" }}>
-            Every fragrance on this site is colour-coded by family, so you can see the shape of a
-            house before you read a word about it. This is the whole vocabulary you need to start.
+            Every fragrance here is coded by family, so you can see the shape of a house before you
+            read a word about it. Pick one to see the houses that work in it.
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-7">
-            {FAMILIES.map((f) => (
-              <div key={f}>
-                <div className="flex items-center gap-2.5 mb-2">
-                  <span className="w-3.5 h-3.5 rounded-[3px]" style={{ background: famFill(f) }} />
-                  <span className="serif text-lg font-semibold" style={{ color: famText(f) }}>
-                    {FAMILY_LABEL[f]}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-2">
+            {FAMILIES.map((f) => {
+              const count = brands.filter((b) => b.families.includes(f)).length;
+              const on = family === f;
+              return (
+                <button
+                  key={f}
+                  onClick={() => pickFamily(f)}
+                  aria-pressed={on}
+                  className="text-left py-3.5 px-3.5 -mx-3.5 transition"
+                  style={{ background: on ? "var(--wash)" : "transparent" }}
+                >
+                  <span className="flex items-center gap-2.5 mb-2">
+                    <span className="w-3.5 h-3.5 rounded-[3px] shrink-0" style={{ background: famFill(f) }} />
+                    <span className="serif text-lg font-semibold" style={{ color: famText(f) }}>
+                      {FAMILY_LABEL[f]}
+                    </span>
+                    <span className="label ml-auto">{count} houses</span>
                   </span>
-                </div>
-                <p style={{ color: "var(--muted)", fontSize: "13.5px" }}>{FAMILY_PRIMER[f]}</p>
-              </div>
-            ))}
+                  <span className="block" style={{ color: "var(--muted)", fontSize: "13.5px" }}>
+                    {FAMILY_PRIMER[f]}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -293,8 +391,8 @@ export default function HomeClient({ brands }) {
             The houses
           </h2>
           <p className="max-w-2xl mb-8" style={{ color: "var(--muted)" }}>
-            The bar under each name is that house's fragrances, coloured by family. It tells you what
-            a house is before you open it.
+            The bar under each name is that house's fragrances, coloured by family. Search reaches
+            fragrance names, notes, families and countries.
           </p>
 
           <div className="flex flex-col md:flex-row gap-2.5 max-w-3xl">
@@ -302,20 +400,20 @@ export default function HomeClient({ brands }) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search a house or a fragrance"
-              className="flex-1 px-4 py-2.5 outline-none text-[13.5px]"
-              style={{ background: "var(--surface)", border: "1px solid var(--rule-firm)", color: "var(--ink)" }}
+              placeholder="Try vetiver, or Japan, or Aventus"
+              className="flex-1 px-4 outline-none text-[13.5px]"
+              style={{ background: "var(--surface)", border: "1px solid var(--rule-firm)", color: "var(--ink)", minHeight: 44 }}
             />
             <div className="flex gap-1.5 flex-wrap">
               {FILTERS.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => setCategory(c.id)}
-                  className="px-3.5 py-2.5 label transition"
+                  className="px-3.5 label transition"
                   style={
                     category === c.id
-                      ? { background: "var(--ink)", color: "var(--paper)" }
-                      : { background: "var(--surface)", border: "1px solid var(--rule-firm)", color: "var(--muted)" }
+                      ? { background: "var(--ink)", color: "var(--paper)", minHeight: 44 }
+                      : { background: "var(--surface)", border: "1px solid var(--rule-firm)", color: "var(--muted)", minHeight: 44 }
                   }
                 >
                   {c.label}
@@ -323,6 +421,22 @@ export default function HomeClient({ brands }) {
               ))}
             </div>
           </div>
+
+          {filtersOn && (
+            <div className="flex items-center gap-3 flex-wrap mt-4">
+              <span className="label">
+                {results.length} {results.length === 1 ? "house" : "houses"}
+                {family ? ` working in ${FAMILY_LABEL[family].toLowerCase()}` : ""}
+              </span>
+              <button
+                onClick={() => { setSearch(""); setCategory("all"); setFamily(null); }}
+                className="label px-2.5 py-1.5 transition hover:opacity-60"
+                style={{ border: "1px solid var(--rule-firm)", color: "var(--ink)" }}
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
         </div>
 
         <div
@@ -333,7 +447,7 @@ export default function HomeClient({ brands }) {
             background: "var(--surface)",
           }}
         >
-          {filtered.map((b) => (
+          {results.map((b) => (
             <button
               key={b.id}
               onClick={() => router.push(`/brands/${b.id}`)}
@@ -347,18 +461,40 @@ export default function HomeClient({ brands }) {
                 <span className="label whitespace-nowrap">{CATEGORY_LABELS[b.category]}</span>
               </span>
               <span className="label" style={{ color: "var(--muted)" }}>{b.origin}</span>
-              <span
-                className="text-[13.5px]"
-                style={{
-                  color: "var(--muted)",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                }}
-              >
-                {b.desc}
-              </span>
+
+              {b.hits.length > 0 ? (
+                <span className="flex flex-wrap gap-1.5 py-0.5">
+                  {b.hits.slice(0, 3).map((h) => (
+                    <span
+                      key={h.name}
+                      className="text-[12px] px-2 py-0.5"
+                      style={{
+                        border: `1px solid ${famFill(h.family)}`,
+                        color: famText(h.family),
+                      }}
+                    >
+                      {h.name}
+                    </span>
+                  ))}
+                  {b.hits.length > 3 && (
+                    <span className="label self-center">+{b.hits.length - 3} more</span>
+                  )}
+                </span>
+              ) : (
+                <span
+                  className="text-[13.5px]"
+                  style={{
+                    color: "var(--muted)",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {b.desc}
+                </span>
+              )}
+
               <span className="fp mt-auto pt-3" title={`${b.perfumes.length} fragrances`}>
                 {b.families.map((f, i) => (
                   <i key={i} style={{ background: famFill(f) }} />
@@ -368,10 +504,19 @@ export default function HomeClient({ brands }) {
           ))}
         </div>
 
-        {filtered.length === 0 && (
+        {results.length === 0 && (
           <div className="px-5 md:px-11 py-16" style={{ background: "var(--surface)" }}>
             <p className="serif text-xl mb-1">No houses match that.</p>
-            <p style={{ color: "var(--muted)" }}>Try another term, or clear the category filter.</p>
+            <p className="mb-5" style={{ color: "var(--muted)" }}>
+              Try a fragrance name, a note like vetiver, a country, or one of the eight families.
+            </p>
+            <button
+              onClick={() => { setSearch(""); setCategory("all"); setFamily(null); }}
+              className="label px-3.5 py-2.5"
+              style={{ background: "var(--ink)", color: "var(--paper)" }}
+            >
+              Clear filters
+            </button>
           </div>
         )}
       </section>
@@ -386,7 +531,7 @@ export default function HomeClient({ brands }) {
           <p className="mb-8" style={{ color: "var(--muted)" }}>
             No account, no form. Say it in your own words, including the words you are not sure about.
           </p>
-          <Consultant />
+          <Consultant seed={seed} onSeedConsumed={() => setSeed(null)} />
         </div>
       </section>
 

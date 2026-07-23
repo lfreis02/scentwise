@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
+import { getRelatedHouses } from "../../../lib/brands";
 import { rootFamily, famFill, famText, FAMILY_LABEL } from "../../../lib/families";
 
 export const revalidate = 60;
@@ -33,8 +34,10 @@ export default async function BrandPage({ params }) {
     .from("brands").select("*").eq("id", id).single();
   if (error || !brand) notFound();
 
-  const { data: perfumesData } = await supabase
-    .from("perfumes").select("*").eq("brand_id", id).order("sort_order", { ascending: true });
+  const [{ data: perfumesData }, related] = await Promise.all([
+    supabase.from("perfumes").select("*").eq("brand_id", id).order("sort_order", { ascending: true }),
+    getRelatedHouses(id, 3),
+  ]);
   const perfumes = perfumesData || [];
 
   const philosophy = brand.philosophy || {};
@@ -58,14 +61,23 @@ export default async function BrandPage({ params }) {
         className="sticky top-0 z-50 flex items-center justify-between px-5 md:px-11 py-3.5"
         style={{ background: "var(--paper)", borderBottom: "1px solid var(--rule)" }}
       >
-        <a href="/" className="flex items-center gap-2.5 hover:opacity-60 transition"
+        <a href="/" className="flex items-center gap-2.5 hover:opacity-60 transition py-1.5"
            style={{ color: "var(--ink)" }}>
           <Mark />
           <span className="serif text-lg font-semibold">
             Scent<span style={{ color: "var(--muted)", fontWeight: 400 }}>Wise</span>
           </span>
         </a>
-        <span className="label hidden md:block">{brand.name}</span>
+        <nav className="flex items-center gap-3.5 md:gap-6">
+          <a href="/#houses" className="label py-2.5 hover:opacity-60">All houses</a>
+          <a
+            href="/#consultant"
+            className="label px-3 py-2.5"
+            style={{ background: "var(--ink)", color: "var(--paper)" }}
+          >
+            Ask
+          </a>
+        </nav>
       </header>
 
       {/* ---------- hero ---------- */}
@@ -395,6 +407,52 @@ export default async function BrandPage({ params }) {
               </a>
             ))}
           </div>
+        </Section>
+      )}
+
+      {/* ---------- where to go next ---------- */}
+      {related.length > 0 && (
+        <Section wash>
+          <SectionLabel>Houses that smell adjacent</SectionLabel>
+          <h2 className="serif font-semibold mb-2" style={{ fontSize: "clamp(1.5rem,3vw,2.1rem)" }}>
+            If {brand.name} works for you, try these.
+          </h2>
+          <p className="mb-8 max-w-2xl" style={{ color: "var(--muted)" }}>
+            Ranked by how closely their fragrance output overlaps with this house's, family by family.
+          </p>
+          <div
+            className="grid"
+            style={{ gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", borderTop: "1px solid var(--rule)" }}
+          >
+            {related.map((r) => (
+              <a
+                key={r.id}
+                href={`/brands/${r.id}`}
+                className="flex flex-col gap-2 px-5 py-5 transition hover:bg-[var(--surface)]"
+                style={{ borderBottom: "1px solid var(--rule)", borderRight: "1px solid var(--rule)" }}
+              >
+                <span className="flex items-baseline justify-between gap-2.5">
+                  <span className="serif text-[19px] font-semibold" style={{ color: "var(--ink)" }}>
+                    {r.name}
+                  </span>
+                  <span className="label whitespace-nowrap">{cap(r.category)}</span>
+                </span>
+                <span className="label" style={{ color: "var(--muted)" }}>{r.origin}</span>
+                <span className="fp mt-auto pt-3" title={`${r.families.length} fragrances`}>
+                  {r.families.map((f, i) => (
+                    <i key={i} style={{ background: famFill(f) }} />
+                  ))}
+                </span>
+              </a>
+            ))}
+          </div>
+          <a
+            href="/#houses"
+            className="inline-flex items-center label px-4 mt-8"
+            style={{ border: "1px solid var(--rule-firm)", color: "var(--ink)", minHeight: 44 }}
+          >
+            Back to all houses
+          </a>
         </Section>
       )}
 
