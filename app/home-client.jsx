@@ -5,6 +5,9 @@ import { FAMILIES, FAMILY_LABEL, famFill, famText } from "../lib/families";
 
 const CATEGORY_LABELS = { niche: "Niche", "luxury-line": "Luxury line", heritage: "Heritage" };
 
+// Turns of context kept for the consultant. The route caps this again server-side.
+const MAX_HISTORY = 20;
+
 const FILTERS = [
   { id: "all", label: "All" },
   { id: "niche", label: "Niche" },
@@ -88,8 +91,11 @@ function Consultant({ seed, onSeedConsumed }) {
   async function send(text) {
     if (!text.trim() || loading) return;
     const userText = text.trim();
-    const nextHistory = [...history, { role: "user", content: userText }];
-    setHistory(nextHistory);
+    // Not committed to state yet: `history` only advances on a completed round
+    // trip. Committing up front left an unanswered user turn behind on every
+    // failure, so a retry during an outage silently piled duplicate intent
+    // into the model's context (and into the tokens we pay for).
+    const attempt = [...history, { role: "user", content: userText }];
     setMessages((prev) => [...prev, { role: "user", text: userText }]);
     setInput("");
     setLoading(true);
@@ -97,14 +103,17 @@ function Consultant({ seed, onSeedConsumed }) {
       const res = await fetch("/api/consultant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextHistory }),
+        body: JSON.stringify({ messages: attempt }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (!data.reply) throw new Error("Empty response");
       setMessages((prev) => [...prev, { role: "bot", text: data.reply }]);
-      setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    } catch {
+      setHistory(
+        [...attempt, { role: "assistant", content: data.reply }].slice(-MAX_HISTORY)
+      );
+    } catch (err) {
+      console.error("[consultant] send failed:", err);
       setMessages((prev) => [...prev, {
         role: "bot",
         text: "The consultant is unreachable right now. Try again shortly, or browse the houses below in the meantime.",
