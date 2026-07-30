@@ -34,10 +34,11 @@ export default async function BrandPage({ params }) {
     .from("brands").select("*").eq("id", id).single();
   if (error || !brand) notFound();
 
-  const [{ data: perfumesData }, related] = await Promise.all([
+  const [{ data: perfumesData, error: perfumesError }, related] = await Promise.all([
     supabase.from("perfumes").select("*").eq("brand_id", id).order("sort_order", { ascending: true }),
     getRelatedHouses(id, 3),
   ]);
+  if (perfumesError) throw perfumesError;
   const perfumes = perfumesData || [];
 
   const philosophy = brand.philosophy || {};
