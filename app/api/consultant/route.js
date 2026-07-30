@@ -25,12 +25,73 @@ Help the person find their ideal fragrance. When they describe an occasion, pref
 
 Tone: sophisticated yet accessible, never judgmental. Every budget deserves a thoughtful recommendation.`;
 
+// --- Abuse limits -----------------------------------------------------
+// This route costs money per call, so bound the cost per request
+// (shape/size) and the cost per attacker (rate limit).
+const MAX_MESSAGES_IN = 50;      // accepted payload length
+const MAX_CONTENT_CHARS = 2000;  // per message
+const RATE_LIMIT = 10;           // requests...
+const RATE_WINDOW_MS = 10 * 60 * 1000; // ...per IP, per 10 minutes
+
+// In-memory: per instance, not shared. Stops a simple loop; for a real
+// guarantee, swap for a shared store (Upstash Redis).
+const hits = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT) {
+    hits.set(ip, recent);
+    return true;
+  }
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 5000) {
+    for (const [key, times] of hits) {
+      if (times.every((t) => now - t >= RATE_WINDOW_MS)) hits.delete(key);
+    }
+  }
+  return false;
+}
+
+function isValidMessages(messages) {
+  if (!Array.isArray(messages) || messages.length === 0) return false;
+  if (messages.length > MAX_MESSAGES_IN) return false;
+  return messages.every(
+    (m) =>
+      m &&
+      typeof m === "object" &&
+      (m.role === "user" || m.role === "assistant") &&
+      typeof m.content === "string" &&
+      m.content.length > 0 &&
+      m.content.length <= MAX_CONTENT_CHARS
+  );
+}
+
 export async function POST(request) {
   try {
+    // Browser requests from this site only. Does not stop curl — it stops
+    // another site from using our endpoint from their own page.
+    const origin = request.headers.get("origin");
+    if (origin && new URL(origin).host !== request.headers.get("host")) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    if (isRateLimited(ip)) {
+      return Response.json(
+        { error: "Too many requests. Try again in a few minutes." },
+        { status: 429, headers: { "Retry-After": "600" } }
+      );
+    }
+
     const { messages } = await request.json();
 
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return Response.json({ error: "messages array required" }, { status: 400 });
+    if (!isValidMessages(messages)) {
+      return Response.json({ error: "Invalid messages payload" }, { status: 400 });
     }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
