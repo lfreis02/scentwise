@@ -137,7 +137,7 @@ function Consultant({ seed, onSeedConsumed }) {
         <span className="label" style={{ color: "var(--ink)" }}>ScentWise consultant</span>
       </div>
 
-      <div className="overflow-y-auto px-4 md:px-6 py-6 flex flex-col gap-4" style={{ height: 420, background: "var(--paper)" }}>
+      <div className="overflow-y-auto px-4 md:px-6 py-6 flex flex-col gap-4" style={{ minHeight: 260, maxHeight: 480, background: "var(--paper)" }}>
         {messages.map((m, i) => (
           <div key={i} className={`max-w-[86%] ${m.role === "user" ? "self-end" : ""}`}>
             <p className="label mb-1">{m.role === "user" ? "You" : "ScentWise"}</p>
@@ -273,6 +273,7 @@ export default function HomeClient({ brands }) {
           background: "linear-gradient(180deg, var(--wash) 0%, var(--surface) 100%)",
         }}
       >
+        <div className="max-w-6xl xl:flex xl:items-end xl:justify-between xl:gap-16">
         <div className="max-w-5xl">
           <p className="label mb-6">The perfume encyclopedia</p>
           <h1
@@ -342,13 +343,14 @@ export default function HomeClient({ brands }) {
               New to this? Start here
             </a>
           </div>
+        </div>
 
-          <div className="flex flex-wrap gap-x-11 gap-y-5 pt-9 mt-9" style={{ borderTop: "1px solid var(--rule)" }}>
-            <Figure n={brands.length} l="houses" />
-            <Figure n={totalFragrances} l="fragrances" />
-            {oldest && <Figure n={oldest} l="oldest house" />}
-            <Figure n={FAMILIES.length} l="olfactory families" />
-          </div>
+        <div className="flex flex-wrap gap-x-11 gap-y-5 pt-9 mt-9 border-t border-[var(--rule)] xl:flex-col xl:items-start xl:gap-y-7 xl:pt-0 xl:mt-0 xl:pl-16 xl:border-t-0 xl:border-l xl:shrink-0">
+          <Figure n={brands.length} l="houses" />
+          <Figure n={totalFragrances} l="fragrances" />
+          {oldest && <Figure n={oldest} l="oldest house" />}
+          <Figure n={FAMILIES.length} l="olfactory families" />
+        </div>
         </div>
       </section>
 
@@ -448,20 +450,12 @@ export default function HomeClient({ brands }) {
           )}
         </div>
 
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill,minmax(252px,1fr))",
-            borderTop: "1px solid var(--rule)",
-            background: "var(--surface)",
-          }}
-        >
+        <div className="house-grid" style={{ borderTop: "1px solid var(--rule)" }}>
           {results.map((b) => (
             <button
               key={b.id}
               onClick={() => router.push(`/brands/${b.id}`)}
-              className="text-left flex flex-col gap-2 px-5 py-5 transition hover:bg-[var(--wash)]"
-              style={{ borderBottom: "1px solid var(--rule)", borderRight: "1px solid var(--rule)" }}
+              className="house-card text-left transition hover:bg-[var(--wash)]"
             >
               <span className="flex items-baseline justify-between gap-2.5">
                 <span className="serif text-[19px] font-semibold" style={{ color: "var(--ink)" }}>
@@ -532,14 +526,16 @@ export default function HomeClient({ brands }) {
 
       {/* ---------- consultant ---------- */}
       <section id="consultant" className="px-5 md:px-11 py-12 md:py-16" style={{ borderBottom: "1px solid var(--rule)" }}>
-        <div className="max-w-3xl" data-reveal>
-          <p className="label mb-5">Ask instead of browse</p>
-          <h2 className="serif font-semibold mb-3" style={{ fontSize: "clamp(1.6rem,3.2vw,2.3rem)" }}>
-            Describe what you want. Get somewhere to start.
-          </h2>
-          <p className="mb-8" style={{ color: "var(--muted)" }}>
-            No account, no form. Say it in your own words, including the words you are not sure about.
-          </p>
+        <div className="max-w-6xl xl:grid xl:grid-cols-[1fr_1.3fr] xl:gap-16 xl:items-start" data-reveal>
+          <div className="max-w-3xl">
+            <p className="label mb-5">Ask instead of browse</p>
+            <h2 className="serif font-semibold mb-3" style={{ fontSize: "clamp(1.6rem,3.2vw,2.3rem)" }}>
+              Describe what you want. Get somewhere to start.
+            </h2>
+            <p className="mb-8" style={{ color: "var(--muted)" }}>
+              No account, no form. Say it in your own words, including the words you are not sure about.
+            </p>
+          </div>
           <Consultant seed={seed} onSeedConsumed={() => setSeed(null)} />
         </div>
       </section>

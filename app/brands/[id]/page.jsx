@@ -173,7 +173,7 @@ export default async function BrandPage({ params }) {
           <div style={{ background: "var(--surface)", borderTop: "1px solid var(--rule)" }}>
             {/* column headings, desktop only */}
             <div
-              className="comp-row hidden md:grid px-11 py-2.5 label"
+              className="comp-row comp-head px-11 py-2.5 label"
               style={{ borderBottom: "1px solid var(--rule)" }}
             >
               <span /><span>Fragrance</span><span className="wide">Year</span>
@@ -189,7 +189,8 @@ export default async function BrandPage({ params }) {
                 ["Base", list(p.notes?.base)],
               ];
               return (
-                <details key={p.id} className="comp">
+                <div key={p.id}>
+                <details className="comp">
                   <summary className="comp-row px-5 md:px-11 py-3.5">
                     <span className="mono tnum text-[11px]" style={{ color: "var(--faint)" }}>
                       {String(i + 1).padStart(2, "0")}
@@ -296,6 +297,37 @@ export default async function BrandPage({ params }) {
                     </div>
                   </div>
                 </details>
+
+                <div className="note-card">
+                  <div className="note-head">
+                    <span className="mono tnum text-[11px]" style={{ color: "var(--faint)" }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span>
+                      <span className="serif block font-semibold" style={{ fontSize: "17px", color: "var(--ink)" }}>
+                        {p.name}
+                      </span>
+                      <span className="label" style={{ color: famText(r) }}>
+                        {FAMILY_LABEL[r]} · {p.year || "—"}
+                      </span>
+                    </span>
+                  </div>
+                  {tiers.map(([t, v]) => (
+                    <div className="note-tier" key={t}>
+                      <span className="label">{t}</span>
+                      <span className="flex flex-wrap gap-1.5">
+                        {v.length ? (
+                          v.map((n, k) => (
+                            <span key={k} className="note-chip">{n}</span>
+                          ))
+                        ) : (
+                          <span className="note-chip-empty">Not published</span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                </div>
               );
             })}
           </div>
@@ -421,16 +453,12 @@ export default async function BrandPage({ params }) {
           <p className="mb-8 max-w-2xl" style={{ color: "var(--muted)" }}>
             Ranked by how closely their fragrance output overlaps with this house's, family by family.
           </p>
-          <div
-            className="grid"
-            style={{ gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", borderTop: "1px solid var(--rule)" }}
-          >
+          <div className="house-grid" style={{ borderTop: "1px solid var(--rule)" }}>
             {related.map((r) => (
               <a
                 key={r.id}
                 href={`/brands/${r.id}`}
-                className="flex flex-col gap-2 px-5 py-5 transition hover:bg-[var(--surface)]"
-                style={{ borderBottom: "1px solid var(--rule)", borderRight: "1px solid var(--rule)" }}
+                className="house-card transition hover:bg-[var(--wash)]"
               >
                 <span className="flex items-baseline justify-between gap-2.5">
                   <span className="serif text-[19px] font-semibold" style={{ color: "var(--ink)" }}>
