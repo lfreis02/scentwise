@@ -48,12 +48,18 @@ that proxies to the Anthropic Messages API. Site copy is in English.
   column onto 8 root families and their color tokens
 - `app/globals.css` — design tokens (`--fam-*` family colors, `--paper` /
   `--ink` / etc.)
+- `scripts/check-data.mjs` (177 lines) — plain-Node integrity check run
+  by `npm run check:data`: notes shape, missing family, orphan
+  fragrances, accent-insensitive duplicate names, duplicate `sort_order`;
+  reads through the anon key, same door as the app
 
 ## Commands
 - `npm run dev` — local dev server
 - `npm run build` — production build
 - `npm run start` — run the production build
 - `npm run lint` — ESLint
+- `npm run check:data` — catalogue integrity check against the live DB
+  (exit 1 on a hard failure; warnings never fail the run)
 
 ## Conventions
 - **Supabase is the single source of truth.** No static brand/fragrance
