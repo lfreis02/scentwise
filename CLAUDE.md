@@ -15,12 +15,15 @@ that proxies to the Anthropic Messages API. Site copy is in English.
   0.12.0) — Postgres + RLS, project id `iqfalqsflpqzizgepmtg`
 - Fonts via `next/font/google`: Fraunces (display), Inter (body), IBM Plex
   Mono (technical) — wired in `app/layout.js`
+- Vercel Web Analytics (`@vercel/analytics` 2.0.1) — `<Analytics />` in
+  `app/layout.js`; only reports once Web Analytics is enabled for the
+  project in the Vercel dashboard
 - ESLint 9 / `eslint-config-next`
 - `lucide-react` is a declared dependency but not imported anywhere in the
   code currently — unused
 
 ## Map
-- `app/layout.js` — root layout, fonts, site metadata
+- `app/layout.js` — root layout, fonts, site metadata, Vercel Analytics
 - `app/page.jsx` (9 lines) — home route, server component, `revalidate =
   60`, calls `getBrands()` and renders `HomeClient`
 - `app/home-client.jsx` (574 lines, `"use client"`) — all home page
