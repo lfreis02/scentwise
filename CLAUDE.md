@@ -32,6 +32,11 @@ that proxies to the Anthropic Messages API. Site copy is in English.
 - `app/api/consultant/route.js` (128 lines) — the only route that costs
   money per call; validates and rate-limits, then proxies to the Anthropic
   Messages API
+- `app/api/keepalive/route.js` (28 lines) — one-row read against
+  `brands`, called daily by Vercel Cron so the free-tier Supabase project
+  never pauses; returns `{ ok }` only, 503 if the read fails
+- `vercel.json` — the cron schedule for `/api/keepalive` (`0 9 * * *`
+  UTC; the Hobby plan allows at most one run per day)
 - `app/error.jsx` (24 lines) — client-component error boundary, site-styled
 - `app/not-found.jsx` (15 lines) — 404 page, site-styled
 - `lib/supabase.js` (8 lines) — Supabase client, guarded by `server-only`
@@ -56,7 +61,7 @@ that proxies to the Anthropic Messages API. Site copy is in English.
   (`brands`, `perfumes`). Adding or editing content is a DB write, not a
   code change.
 - **`perfumes.notes` is always a JSON array** (top/heart/base), never a
-  comma-separated string — confirmed on all 582 rows currently in the
+  comma-separated string — confirmed on all 739 rows currently in the
   table.
 - **The consultant model is `claude-sonnet-4-6`**, hardcoded in
   `app/api/consultant/route.js`.
@@ -65,6 +70,11 @@ that proxies to the Anthropic Messages API. Site copy is in English.
   minutes (in-memory, per instance — resets per deploy/instance, not a
   hard guarantee), only the last 20 messages forwarded to the model,
   same-origin requests only.
+- **The Supabase project is on the free tier and pauses after about a
+  week without activity.** `/api/keepalive` + the cron in `vercel.json`
+  exist only to prevent that — do not cache the route or remove the cron.
+  If the project is ever `INACTIVE` anyway, restore it from the Supabase
+  dashboard (or MCP `restore_project`); the data survives a pause.
 - **`anon`/`authenticated` have SELECT-only privileges** on `brands` and
   `perfumes` (table-level write grants revoked; RLS enabled on both) —
   confirmed live in the DB. Any future write needs the `service_role` key,
@@ -74,7 +84,7 @@ that proxies to the Anthropic Messages API. Site copy is in English.
   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ANTHROPIC_API_KEY`.
 
 ## State
-- Catalogue currently at 77 houses / 582 fragrances (live count).
+- Catalogue currently at 77 houses / 739 fragrances (live count).
 - All 5 code-reviewer findings from the last review round are closed:
   1. Cost/rate-limit bound on `/api/consultant` (`cd533c3`)
   2. `server-only` build tripwire on `lib/supabase.js` (`6febb8c`)
